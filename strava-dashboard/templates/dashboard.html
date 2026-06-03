@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activity Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <span class="nav-logo">🏃 Activity Dashboard</span>
+  </div>
+  <div class="nav-right">
+    <span class="athlete-name">{{ athlete.firstname }} {{ athlete.lastname }}</span>
+    <a href="/logout" class="nav-logout">Disconnect</a>
+  </div>
+</nav>
+
+<main class="container">
+
+  <!-- Period selector -->
+  <div class="section-header">
+    <h2>Overview</h2>
+    <div class="period-tabs">
+      <button class="period-tab active" data-period="week">This week</button>
+      <button class="period-tab" data-period="month">This month</button>
+      <button class="period-tab" data-period="year">This year</button>
+    </div>
+  </div>
+
+  <!-- KPI cards -->
+  <div class="kpi-grid" id="kpi-grid">
+    <div class="kpi-card skeleton"></div>
+    <div class="kpi-card skeleton"></div>
+    <div class="kpi-card skeleton"></div>
+    <div class="kpi-card skeleton"></div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="charts-row">
+    <div class="card chart-card wide">
+      <div class="card-header">
+        <h3>Weekly Distance (km)</h3>
+        <div class="legend">
+          <span class="dot run"></span> Run
+          <span class="dot all"></span> All sports
+        </div>
+      </div>
+      <canvas id="weeklyChart" height="90"></canvas>
+    </div>
+
+    <div class="card chart-card">
+      <div class="card-header"><h3>Heart Rate Zones</h3></div>
+      <canvas id="zonesChart" height="160"></canvas>
+      <div class="zone-legend">
+        <span class="zone-dot z1"></span>Z1 Recovery
+        <span class="zone-dot z2"></span>Z2 Aerobic
+        <span class="zone-dot z3"></span>Z3 Tempo
+        <span class="zone-dot z4"></span>Z4 Threshold
+        <span class="zone-dot z5"></span>Z5 VO2max
+      </div>
+    </div>
+  </div>
+
+  <!-- Pace trend -->
+  <div class="card chart-card full">
+    <div class="card-header"><h3>Run Pace Trend (last 20 runs)</h3></div>
+    <canvas id="paceChart" height="70"></canvas>
+  </div>
+
+  <!-- Sport breakdown -->
+  <div class="charts-row">
+    <div class="card chart-card">
+      <div class="card-header"><h3>Sport Breakdown</h3></div>
+      <canvas id="sportChart" height="160"></canvas>
+    </div>
+
+    <!-- Compare this vs last period -->
+    <div class="card chart-card">
+      <div class="card-header"><h3>Period Comparison</h3></div>
+      <canvas id="compareChart" height="160"></canvas>
+    </div>
+  </div>
+
+  <!-- Activity list -->
+  <div class="card full">
+    <div class="card-header">
+      <h3>Recent Activities</h3>
+      <input id="search" class="search-input" type="text" placeholder="Filter activities…">
+    </div>
+    <div class="table-wrap">
+      <table id="activity-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Activity</th>
+            <th>Date</th>
+            <th>Distance</th>
+            <th>Time</th>
+            <th>Pace / Speed</th>
+            <th>Avg HR</th>
+            <th>Max HR</th>
+            <th>Elev.</th>
+            <th>Suffer</th>
+            <th>Calories</th>
+          </tr>
+        </thead>
+        <tbody id="activity-tbody">
+          <tr><td colspan="11" class="loading-row">Loading activities…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<script>
+let statsData = null;
+let activitiesData = [];
+let currentPeriod = 'week';
+
+// ── helpers ──────────────────────────────────────────────────────────────────
+function fmt(n, unit='') { return n != null ? `${n}${unit}` : '–'; }
+function fmtTime(s) {
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60);
+  return h ? `${h}h${String(m).padStart(2,'0')}m` : `${m}m`;
+}
+function paceFromS(pace_s) {
+  const m = Math.floor(pace_s/60), s = pace_s%60;
+  return `${m}:${String(s).padStart(2,'0')} /km`;
+}
+function delta(curr, prev, unit='', higherBetter=true) {
+  if (!prev) return '';
+  const d = curr - prev;
+  const pct = prev ? Math.round(Math.abs(d)/prev*100) : 0;
+  const up = d >= 0;
+  const good = higherBetter ? up : !up;
+  const arrow = up ? '▲' : '▼';
+  return `<span class="delta ${good?'good':'bad'}">${arrow} ${Math.abs(d).toFixed(1)}${unit} (${pct}%)</span>`;
+}
+
+// ── KPI cards ─────────────────────────────────────────────────────────────────
+function renderKPIs(period) {
+  const curr = statsData[period === 'week' ? 'this_week' : period === 'month' ? 'this_month' : 'this_year'];
+  const prev = statsData[period === 'week' ? 'last_week' : 'last_month'];
+  const grid = document.getElementById('kpi-grid');
+  grid.innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-label">Run Distance</div>
+      <div class="kpi-value">${curr.run_distance_km} <span class="kpi-unit">km</span></div>
+      ${prev ? delta(curr.run_distance_km, prev.run_distance_km, ' km') : ''}
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Activities</div>
+      <div class="kpi-value">${curr.count}</div>
+      ${prev ? delta(curr.count, prev.count, '', true) : ''}
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Moving Time</div>
+      <div class="kpi-value">${fmtTime(curr.moving_time_s)}</div>
+      ${prev ? delta(Math.round(curr.moving_time_s/60), Math.round(prev.moving_time_s/60), ' min') : ''}
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Elevation Gain</div>
+      <div class="kpi-value">${curr.elevation_m} <span class="kpi-unit">m</span></div>
+      ${prev ? delta(curr.elevation_m, prev.elevation_m, ' m') : ''}
+    </div>
+  `;
+}
+
+// ── Charts ────────────────────────────────────────────────────────────────────
+let charts = {};
+
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+function renderWeeklyChart(data) {
+  destroyChart('weekly');
+  const ctx = document.getElementById('weeklyChart');
+  charts['weekly'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.map(d => d.week),
+      datasets: [
+        { label: 'All sports', data: data.map(d => d.all_distance_km), backgroundColor: 'rgba(99,179,237,0.3)', borderColor: 'rgba(99,179,237,0.7)', borderWidth: 1, borderRadius: 4 },
+        { label: 'Run', data: data.map(d => d.distance_km), backgroundColor: 'rgba(252,129,74,0.8)', borderColor: 'rgba(252,129,74,1)', borderWidth: 1, borderRadius: 4 },
+      ]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#9ca3af' } }, x: { grid: { display: false }, ticks: { color: '#9ca3af' } } } }
+  });
+}
+
+function renderZonesChart(zones) {
+  destroyChart('zones');
+  const total = zones.reduce((a,b)=>a+b, 0);
+  const labels = ['Z1 Recovery','Z2 Aerobic','Z3 Tempo','Z4 Threshold','Z5 VO2max'];
+  const colors = ['#60a5fa','#34d399','#fbbf24','#f97316','#ef4444'];
+  charts['zones'] = new Chart(document.getElementById('zonesChart'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: zones, backgroundColor: colors, borderWidth: 0 }] },
+    options: {
+      cutout: '65%', responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: (c) => {
+          const pct = total ? Math.round(c.parsed/total*100) : 0;
+          return ` ${fmtTime(c.parsed)} (${pct}%)`;
+        }}}
+      }
+    }
+  });
+}
+
+function renderPaceChart(trend) {
+  destroyChart('pace');
+  if (!trend.length) return;
+  charts['pace'] = new Chart(document.getElementById('paceChart'), {
+    type: 'line',
+    data: {
+      labels: trend.map(d => d.date),
+      datasets: [{
+        label: 'Pace (s/km)',
+        data: trend.map(d => d.pace_s),
+        borderColor: '#a78bfa',
+        backgroundColor: 'rgba(167,139,250,0.15)',
+        fill: true, tension: 0.35, pointRadius: 4, pointHoverRadius: 6,
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => ` ${paceFromS(c.parsed.y)}`, title: (items) => trend[items[0].dataIndex].name } }
+      },
+      scales: {
+        y: { reverse: true, ticks: { color: '#9ca3af', callback: v => paceFromS(v) }, grid: { color: 'rgba(255,255,255,0.06)' } },
+        x: { ticks: { color: '#9ca3af', maxTicksLimit: 10 }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function renderSportChart(breakdown) {
+  destroyChart('sport');
+  const entries = Object.entries(breakdown).sort((a,b) => b[1].count - a[1].count).slice(0, 6);
+  const colors = ['#f97316','#60a5fa','#34d399','#fbbf24','#a78bfa','#f472b6'];
+  charts['sport'] = new Chart(document.getElementById('sportChart'), {
+    type: 'doughnut',
+    data: {
+      labels: entries.map(e => e[0]),
+      datasets: [{ data: entries.map(e => e[1].count), backgroundColor: colors, borderWidth: 0 }]
+    },
+    options: { cutout: '60%', responsive: true, plugins: { legend: { position: 'right', labels: { color: '#d1d5db', font: { size: 12 } } } } }
+  });
+}
+
+function renderCompareChart(period) {
+  destroyChart('compare');
+  const curr = statsData[period === 'week' ? 'this_week' : 'this_month'];
+  const prev = statsData[period === 'week' ? 'last_week' : 'last_month'];
+  if (!prev) return;
+  const labels = ['Distance (km)', 'Time (h)', 'Elevation (100m)', 'Activities'];
+  const currVals = [curr.run_distance_km, +(curr.moving_time_s/3600).toFixed(1), +(curr.elevation_m/100).toFixed(1), curr.count];
+  const prevVals = [prev.run_distance_km, +(prev.moving_time_s/3600).toFixed(1), +(prev.elevation_m/100).toFixed(1), prev.count];
+  charts['compare'] = new Chart(document.getElementById('compareChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: period === 'week' ? 'Last week' : 'Last month', data: prevVals, backgroundColor: 'rgba(156,163,175,0.4)', borderRadius: 4 },
+        { label: period === 'week' ? 'This week' : 'This month', data: currVals, backgroundColor: 'rgba(252,129,74,0.8)', borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true, plugins: { legend: { labels: { color: '#d1d5db' } } },
+      scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#9ca3af' } }, x: { grid: { display: false }, ticks: { color: '#9ca3af' } } }
+    }
+  });
+}
+
+// ── Activity table ────────────────────────────────────────────────────────────
+function hrZoneBadge(hr) {
+  if (!hr) return '–';
+  const pct = hr / 190;
+  if (pct < 0.60) return `<span class="zone-badge z1">${Math.round(hr)}</span>`;
+  if (pct < 0.70) return `<span class="zone-badge z2">${Math.round(hr)}</span>`;
+  if (pct < 0.80) return `<span class="zone-badge z3">${Math.round(hr)}</span>`;
+  if (pct < 0.90) return `<span class="zone-badge z4">${Math.round(hr)}</span>`;
+  return `<span class="zone-badge z5">${Math.round(hr)}</span>`;
+}
+
+function renderTable(activities) {
+  const tbody = document.getElementById('activity-tbody');
+  if (!activities.length) {
+    tbody.innerHTML = '<tr><td colspan="11" class="loading-row">No activities found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = activities.map(a => `
+    <tr>
+      <td class="sport-icon">${a.icon}</td>
+      <td class="activity-name">
+        <a href="https://www.strava.com/activities/${a.id}" target="_blank">${a.name}</a>
+        ${a.pr_count ? `<span class="pr-badge">🏆 PR</span>` : ''}
+      </td>
+      <td>${a.date}</td>
+      <td>${a.distance_km > 0 ? a.distance_km + ' km' : '–'}</td>
+      <td>${a.moving_time_fmt}</td>
+      <td class="mono">${a.avg_pace || a.avg_speed_kmh + ' km/h'}</td>
+      <td>${hrZoneBadge(a.avg_hr)}</td>
+      <td>${a.max_hr ? Math.round(a.max_hr) : '–'}</td>
+      <td>${a.elevation_m > 0 ? a.elevation_m + ' m' : '–'}</td>
+      <td>${a.suffer_score != null ? `<span class="suffer suffer-${Math.min(4,Math.floor(a.suffer_score/25))}">${a.suffer_score}</span>` : '–'}</td>
+      <td>${a.calories ? Math.round(a.calories) + ' kcal' : '–'}</td>
+    </tr>
+  `).join('');
+}
+
+// ── Search ────────────────────────────────────────────────────────────────────
+document.getElementById('search').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  const filtered = activitiesData.filter(a =>
+    a.name.toLowerCase().includes(q) || a.sport.toLowerCase().includes(q) || a.date.includes(q)
+  );
+  renderTable(filtered);
+});
+
+// ── Period tabs ───────────────────────────────────────────────────────────────
+document.querySelectorAll('.period-tab').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.period-tab').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    currentPeriod = this.dataset.period;
+    renderKPIs(currentPeriod);
+    renderCompareChart(currentPeriod);
+  });
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init() {
+  const [statsRes, actsRes] = await Promise.all([
+    fetch('/api/stats').then(r => r.json()),
+    fetch('/api/activities?weeks=24').then(r => r.json()),
+  ]);
+
+  statsData = statsRes;
+  activitiesData = actsRes;
+
+  renderKPIs(currentPeriod);
+  renderWeeklyChart(statsRes.weekly_chart);
+  renderZonesChart(statsRes.hr_zones);
+  renderPaceChart(statsRes.pace_trend);
+  renderSportChart(statsRes.sport_breakdown);
+  renderCompareChart(currentPeriod);
+  renderTable(actsRes);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal Sport Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #07090f;
+  --surface: #0f1219;
+  --card: rgba(255,255,255,0.034);
+  --card-h: rgba(255,255,255,0.055);
+  --border: rgba(255,255,255,0.07);
+  --border-h: rgba(255,255,255,0.14);
+  --text: #e2e8f0;
+  --t2: #94a3b8;
+  --muted: #475569;
+  --run: #fb923c;
+  --run-d: rgba(251,146,60,0.12);
+  --bike: #38bdf8;
+  --bike-d: rgba(56,189,248,0.12);
+  --work: #c084fc;
+  --work-d: rgba(192,132,252,0.12);
+  --z1: #22c55e; --z2: #84cc16; --z3: #eab308; --z4: #f97316; --z5: #ef4444;
+  --green: #22c55e; --red: #ef4444;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+/* ambient glow */
+body::before {
+  content:''; position:fixed; top:-300px; left:-200px;
+  width:700px; height:700px; pointer-events:none; z-index:0;
+  background: radial-gradient(circle, rgba(251,146,60,.07) 0%, transparent 65%);
+}
+body::after {
+  content:''; position:fixed; bottom:-200px; right:-100px;
+  width:600px; height:600px; pointer-events:none; z-index:0;
+  background: radial-gradient(circle, rgba(56,189,248,.05) 0%, transparent 65%);
+}
+.wrap { max-width:1400px; margin:0 auto; padding:28px 24px; position:relative; z-index:1; }
+
+/* ── HEADER ── */
+.hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:26px; }
+.hdr-l { display:flex; align-items:center; gap:14px; }
+.hdr-icon {
+  width:42px; height:42px; border-radius:12px; font-size:20px;
+  display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(135deg, #fb923c 0%, #dc2626 100%);
+  box-shadow: 0 4px 16px rgba(251,146,60,.3);
+}
+.hdr-title { font-size:20px; font-weight:700; letter-spacing:-0.3px; }
+.hdr-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+.hdr-r { display:flex; align-items:center; gap:12px; }
+.sync-label { text-align:right; }
+.sync-status { font-size:12px; color:var(--green); }
+.sync-time { font-size:11px; color:var(--muted); }
+.btn { background:var(--card); border:1px solid var(--border-h); color:var(--text); padding:8px 16px; border-radius:8px; font-size:13px; cursor:pointer; transition:all .2s; }
+.btn:hover { background:var(--card-h); border-color:var(--run); }
+
+/* ── TAB NAV ── */
+.tab-nav { display:flex; gap:2px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:3px; width:fit-content; margin-bottom:22px; }
+.tab-btn { padding:7px 20px; border-radius:7px; border:none; background:none; color:var(--t2); font-size:13px; font-weight:500; cursor:pointer; transition:all .2s; }
+.tab-btn.active { background:rgba(255,255,255,.08); color:var(--text); }
+.tab-btn:hover:not(.active) { color:var(--text); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+/* ── FILTER BAR ── */
+.fbar { display:flex; align-items:center; gap:6px; margin-bottom:22px; flex-wrap:wrap; }
+.fbar-label { font-size:11px; color:var(--muted); margin-right:4px; text-transform:uppercase; letter-spacing:.8px; }
+.fbtn { padding:5px 13px; border-radius:20px; border:1px solid var(--border); background:none; color:var(--t2); font-size:12px; cursor:pointer; transition:all .2s; }
+.fbtn:hover:not(.active) { border-color:var(--border-h); color:var(--text); }
+.fbtn.active { background:var(--run); border-color:var(--run); color:#fff; font-weight:600; }
+.fbar-sep { width:1px; height:18px; background:var(--border); margin:0 4px; }
+.sfbtn { padding:5px 12px; border-radius:20px; border:1px solid var(--border); background:none; color:var(--t2); font-size:11px; cursor:pointer; transition:all .2s; }
+.sfbtn:hover { border-color:var(--border-h); }
+.sfbtn.s-run.on  { background:var(--run-d);  border-color:var(--run);  color:var(--run); }
+.sfbtn.s-bike.on { background:var(--bike-d); border-color:var(--bike); color:var(--bike); }
+.sfbtn.s-work.on { background:var(--work-d); border-color:var(--work); color:var(--work); }
+
+/* ── STAT GRID ── */
+.sg { display:grid; grid-template-columns:repeat(6,1fr); gap:14px; margin-bottom:18px; }
+.sc {
+  background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 16px;
+  position:relative; overflow:hidden; transition:border-color .2s, background .2s;
+  border-top:2px solid var(--ac, var(--border-h));
+}
+.sc:hover { border-color:var(--border-h); background:var(--card-h); }
+.sc-ico { font-size:17px; margin-bottom:10px; }
+.sc-lbl { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:5px; }
+.sc-val { font-size:25px; font-weight:700; letter-spacing:-.5px; line-height:1; }
+.sc-val .u { font-size:12px; font-weight:400; color:var(--t2); margin-left:3px; }
+.sc-sub { font-size:11px; color:var(--muted); margin-top:6px; }
+
+/* ── GRIDS ── */
+.g2  { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.g3  { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.g4  { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+.g21 { display:grid; grid-template-columns:2fr 1fr; gap:16px; }
+.mb  { margin-bottom:18px; }
+
+/* ── CARD ── */
+.card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; transition:border-color .2s; }
+.card:hover { border-color:var(--border-h); }
+.card-hd { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; }
+.card-title { font-size:14px; font-weight:600; }
+.card-sub { font-size:11px; color:var(--muted); margin-top:3px; }
+
+/* ── ACTIVITY ROWS ── */
+.act-list { display:flex; flex-direction:column; gap:9px; }
+.act-row {
+  display:flex; align-items:center; gap:12px;
+  background:rgba(255,255,255,.02); border:1px solid var(--border);
+  border-radius:10px; padding:12px 14px; transition:all .2s;
+}
+.act-row:hover { background:rgba(255,255,255,.04); border-color:var(--border-h); }
+.sport-pip { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.act-info { flex:1; min-width:0; }
+.act-nm { font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.act-dt { font-size:10px; color:var(--muted); margin-top:2px; }
+.act-nums { display:flex; gap:16px; flex-shrink:0; }
+.anum { text-align:right; }
+.anum-v { font-size:14px; font-weight:700; }
+.anum-l { font-size:10px; color:var(--muted); }
+.hr-pill {
+  font-size:11px; font-weight:600; padding:3px 9px; border-radius:20px;
+  flex-shrink:0; white-space:nowrap;
+}
+
+/* ── HR ZONE TRACK ── */
+.zone-track {
+  height:6px; border-radius:3px; position:relative;
+  background: linear-gradient(to right,
+    var(--z1) 0% 71.2%, var(--z2) 71.2% 82.3%,
+    var(--z3) 82.3% 85.4%, var(--z4) 85.4% 89.4%,
+    var(--z5) 89.4% 100%);
+}
+.zone-needle {
+  position:absolute; top:50%; transform:translate(-50%,-50%);
+  width:12px; height:12px; border-radius:50%;
+  background:#fff; border:1.5px solid rgba(0,0,0,.5);
+  box-shadow:0 0 0 2px rgba(255,255,255,.25);
+}
+
+/* ── ZONE REF LIST ── */
+.zref { display:flex; flex-direction:column; gap:10px; }
+.zr { display:flex; align-items:center; gap:10px; font-size:12px; }
+.zr-dot { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+.zr-name { width:105px; font-weight:600; flex-shrink:0; }
+.zr-bpm { color:var(--muted); font-size:11px; flex:1; }
+.zr-act { font-size:11px; font-weight:600; text-align:right; }
+
+/* ── SECTION TITLE ── */
+.stitle {
+  font-size:11px; text-transform:uppercase; letter-spacing:1.2px;
+  color:var(--muted); font-weight:600; margin-bottom:12px;
+  display:flex; align-items:center; gap:10px;
+}
+.stitle::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ── SPORT SECTION HEADER ── */
+.sport-hdr { display:flex; align-items:center; gap:10px; margin:24px 0 14px; }
+.sport-bar { width:3px; height:18px; border-radius:2px; flex-shrink:0; }
+.sport-hdr-title { font-size:14px; font-weight:600; }
+.sport-cnt { font-size:11px; color:var(--muted); background:rgba(255,255,255,.05); padding:2px 8px; border-radius:20px; }
+
+/* ── COMPARE TABLE ── */
+.ctbl { width:100%; border-collapse:collapse; font-size:12px; }
+.ctbl th { text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--border); }
+.ctbl td { padding:9px 10px; border-bottom:1px solid rgba(255,255,255,.04); }
+.ctbl tr:last-child td { border:none; }
+.y25 { color:var(--bike); font-weight:600; }
+.y26 { color:var(--run); font-weight:600; }
+.up { color:var(--green); font-size:12px; }
+.dn { color:var(--red); font-size:12px; }
+.neu { color:var(--muted); font-size:12px; }
+
+/* ── BEST PERF ── */
+.best-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.best-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; text-align:center; transition:all .2s; }
+.best-card:hover { border-color:var(--border-h); background:var(--card-h); }
+.best-ico { font-size:26px; margin-bottom:10px; }
+.best-val { font-size:22px; font-weight:700; }
+.best-lbl { font-size:11px; color:var(--muted); margin-top:5px; }
+.best-ctx { font-size:11px; color:var(--t2); margin-top:7px; padding-top:7px; border-top:1px solid var(--border); }
+
+/* ── YEAR SUMMARY CARD ── */
+.year-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; }
+.year-rows { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+.yr { display:flex; justify-content:space-between; font-size:13px; }
+.yr-k { color:var(--muted); }
+.yr-v { font-weight:600; }
+
+/* ── INSIGHT CARD ── */
+.ins-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; border-top:2px solid var(--ic, var(--border-h)); }
+.ins-title { font-size:13px; font-weight:600; margin-bottom:8px; }
+.ins-body { font-size:12px; color:var(--t2); line-height:1.65; }
+
+/* scrollbar */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12); border-radius:3px; }
+
+@media(max-width:1100px) {
+  .sg { grid-template-columns:repeat(3,1fr); }
+  .g2,.g3,.g4,.g21 { grid-template-columns:1fr; }
+  .best-grid { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-l">
+    <div class="hdr-icon">⚡</div>
+    <div>
+      <div class="hdr-title">Personal Sport Dashboard</div>
+      <div class="hdr-sub">Strava · Apple Watch SE · Polar</div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <div class="sync-label">
+      <div class="sync-status">● Connected</div>
+      <div class="sync-time">Last synced: June 3, 2026</div>
+    </div>
+    <button class="btn" onclick="syncInfo()">⟳ Sync Strava</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('overview',this)">Overview</button>
+  <button class="tab-btn" onclick="switchTab('analysis',this)">Analysis</button>
+  <button class="tab-btn" onclick="switchTab('year',this)">Year Stats</button>
+</div>
+
+<!-- ══════════ TAB 1: OVERVIEW ══════════ -->
+<div id="tab-overview" class="tab-panel active">
+
+  <div class="fbar">
+    <span class="fbar-label">Period</span>
+    <button class="fbtn" onclick="setF('1w',this)">1 Week</button>
+    <button class="fbtn" onclick="setF('6w',this)">6 Weeks</button>
+    <button class="fbtn" onclick="setF('6m',this)">6 Months</button>
+    <button class="fbtn" onclick="setF('1y',this)">1 Year</button>
+    <button class="fbtn active" onclick="setF('all',this)">All Time</button>
+    <div class="fbar-sep"></div>
+    <button class="sfbtn s-run on" onclick="toggleSport('running',this)">🏃 Run</button>
+    <button class="sfbtn s-bike on" onclick="toggleSport('cycling',this)">🚴 Cycling</button>
+    <button class="sfbtn s-work on" onclick="toggleSport('workout',this)">💪 Workout</button>
+  </div>
+
+  <div class="sg mb">
+    <div class="sc" style="--ac:var(--t2)"><div class="sc-ico">🏅</div><div class="sc-lbl">Activities</div><div class="sc-val" id="s-acts">8</div><div class="sc-sub" id="s-acts-s">all sports</div></div>
+    <div class="sc" style="--ac:var(--run)"><div class="sc-ico">📍</div><div class="sc-lbl">Total Distance</div><div class="sc-val" id="s-dist">154.4<span class="u">km</span></div><div class="sc-sub" id="s-dist-s">—</div></div>
+    <div class="sc" style="--ac:var(--bike)"><div class="sc-ico">⏱</div><div class="sc-lbl">Moving Time</div><div class="sc-val" id="s-time">7:16<span class="u">h</span></div><div class="sc-sub" id="s-time-s">—</div></div>
+    <div class="sc" style="--ac:var(--z4)"><div class="sc-ico">❤️</div><div class="sc-lbl">Avg Heart Rate</div><div class="sc-val" id="s-hr">160<span class="u">bpm</span></div><div class="sc-sub" id="s-hr-s">3 activities with HR</div></div>
+    <div class="sc" style="--ac:var(--run)"><div class="sc-ico">⚡</div><div class="sc-lbl">Best Run Pace</div><div class="sc-val" id="s-pace">4:30<span class="u">/km</span></div><div class="sc-sub" id="s-pace-s">fastest run</div></div>
+    <div class="sc" style="--ac:var(--work)"><div class="sc-ico">⛰</div><div class="sc-lbl">Elevation</div><div class="sc-val" id="s-elev">250<span class="u">m</span></div><div class="sc-sub" id="s-elev-s">total gain</div></div>
+  </div>
+
+  <div class="g21 mb">
+    <div class="card">
+      <div class="card-hd"><div><div class="card-title">Activities</div><div class="card-sub" id="act-sub">all time · all sports</div></div></div>
+      <div class="act-list" id="actList"></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div><div class="card-title">HR Zones</div><div class="card-sub">Personal zones · max 198 bpm</div></div></div>
+      <div class="zref" id="zoneRef"></div>
+      <div style="height:1px;background:var(--border);margin:14px 0"></div>
+      <div id="zoneTrackWrap"></div>
+    </div>
+  </div>
+
+  <div class="g2 mb">
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Distance per Activity</div></div>
+      <div style="height:200px;position:relative"><canvas id="volChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Sport Distribution</div><div class="card-sub">by distance (km)</div></div>
+      <div style="display:flex;align-items:center;gap:16px;height:200px">
+        <div style="height:180px;width:180px;flex-shrink:0;position:relative"><canvas id="donutChart"></canvas></div>
+        <div style="flex:1" id="donutLegend"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════ TAB 2: ANALYSIS ══════════ -->
+<div id="tab-analysis" class="tab-panel">
+
+  <div class="fbar">
+    <span class="fbar-label">Period</span>
+    <button class="fbtn" onclick="setF('1w',this)">1 Week</button>
+    <button class="fbtn" onclick="setF('6w',this)">6 Weeks</button>
+    <button class="fbtn" onclick="setF('6m',this)">6 Months</button>
+    <button class="fbtn" onclick="setF('1y',this)">1 Year</button>
+    <button class="fbtn active" onclick="setF('all',this)">All Time</button>
+  </div>
+
+  <div class="sport-hdr"><div class="sport-bar" style="background:var(--run)"></div><span class="sport-hdr-title">Running</span><span class="sport-cnt" id="run-cnt">3 runs</span></div>
+  <div class="g2 mb">
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Pace per Run</div><div class="card-sub">min/km — lower = faster</div></div>
+      <div style="height:190px;position:relative"><canvas id="paceChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Running Power</div><div class="card-sub">Apple Watch SE watts</div></div>
+      <div style="height:190px;position:relative"><canvas id="powerChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="sport-hdr"><div class="sport-bar" style="background:var(--bike)"></div><span class="sport-hdr-title">Cycling</span><span class="sport-cnt" id="bike-cnt">4 rides</span></div>
+  <div class="g2 mb">
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Avg Speed per Ride</div><div class="card-sub">km/h</div></div>
+      <div style="height:190px;position:relative"><canvas id="speedChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Distance per Ride</div><div class="card-sub">km</div></div>
+      <div style="height:190px;position:relative"><canvas id="bikeDistChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="sport-hdr"><div class="sport-bar" style="background:var(--t2)"></div><span class="sport-hdr-title">All Sports — Year Comparison</span></div>
+  <div class="card mb">
+    <table class="ctbl">
+      <thead><tr><th>Metric</th><th>2025 (full year)</th><th>2026 (to date)</th><th>Trend</th></tr></thead>
+      <tbody>
+        <tr><td>Activities</td><td class="y25">6</td><td class="y26">2</td><td class="neu">—</td></tr>
+        <tr><td>Total distance</td><td class="y25">98.7 km</td><td class="y26">55.6 km</td><td class="neu">—</td></tr>
+        <tr><td>Total moving time</td><td class="y25">4h 46m</td><td class="y26">2h 31m</td><td class="neu">—</td></tr>
+        <tr><td>Running pace (avg)</td><td class="y25">4:47 /km</td><td class="y26">4:37 /km</td><td class="up">↑ 10s faster</td></tr>
+        <tr><td>Running power (avg)</td><td class="y25">224 W</td><td class="y26">273 W</td><td class="up">↑ +49W (+22%)</td></tr>
+        <tr><td>Cycling avg speed</td><td class="y25">24.7 km/h</td><td class="y26">26.1 km/h</td><td class="up">↑ +1.4 km/h</td></tr>
+        <tr><td>Longest ride</td><td class="y25">36.1 km</td><td class="y26">45.7 km</td><td class="up">↑ +9.6 km</td></tr>
+        <tr><td>Avg HR (HR acts only)</td><td class="y25">150.5 bpm</td><td class="y26">179 bpm</td><td class="dn">↑ much higher intensity</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ══════════ TAB 3: YEAR STATS ══════════ -->
+<div id="tab-year" class="tab-panel">
+
+  <div class="stitle">Best Performances — All Time</div>
+  <div class="best-grid mb">
+    <div class="best-card"><div class="best-ico">🏃</div><div class="best-val" style="color:var(--run)">4:30/km</div><div class="best-lbl">Best run pace</div><div class="best-ctx">Jun 7, 2025 · 10 km · sub-45 min</div></div>
+    <div class="best-card"><div class="best-ico">🚴</div><div class="best-val" style="color:var(--bike)">49.0 km/h</div><div class="best-lbl">Top cycling speed</div><div class="best-ctx">Afternoon Ride · Jun 25, 2025</div></div>
+    <div class="best-card"><div class="best-ico">📍</div><div class="best-val" style="color:var(--bike)">45.7 km</div><div class="best-lbl">Longest ride</div><div class="best-ctx">Genieten van zon · Mar 4, 2026</div></div>
+    <div class="best-card"><div class="best-ico">⚡</div><div class="best-val" style="color:#e879f9">384 W</div><div class="best-lbl">Peak running power</div><div class="best-ctx">Afternoon Run · May 31, 2026</div></div>
+  </div>
+
+  <div class="stitle">2025 — Full Year</div>
+  <div class="g3 mb">
+    <div class="year-card" style="border-top:2px solid var(--bike)"><div class="card-title" style="color:var(--bike)">2025 Overview</div><div class="year-rows"><div class="yr"><span class="yr-k">Activities</span><span class="yr-v">6</span></div><div class="yr"><span class="yr-k">Total distance</span><span class="yr-v">98.7 km</span></div><div class="yr"><span class="yr-k">Moving time</span><span class="yr-v">4h 46m</span></div><div class="yr"><span class="yr-k">Elevation</span><span class="yr-v">+163.7 m</span></div><div class="yr"><span class="yr-k">Avg HR (HR acts)</span><span class="yr-v">150.5 bpm</span></div></div></div>
+    <div class="year-card" style="border-top:2px solid var(--run)"><div class="card-title" style="color:var(--run)">2025 Running</div><div class="year-rows"><div class="yr"><span class="yr-k">Runs</span><span class="yr-v">2</span></div><div class="yr"><span class="yr-k">Distance</span><span class="yr-v">15.6 km</span></div><div class="yr"><span class="yr-k">Time</span><span class="yr-v">1h 14m</span></div><div class="yr"><span class="yr-k">Avg pace</span><span class="yr-v">4:47 /km</span></div><div class="yr"><span class="yr-k">Best pace</span><span class="yr-v" style="color:var(--green)">4:30 /km</span></div><div class="yr"><span class="yr-k">Avg HR</span><span class="yr-v">164 bpm (Z3)</span></div></div></div>
+    <div class="year-card" style="border-top:2px solid var(--bike)"><div class="card-title" style="color:var(--bike)">2025 Cycling</div><div class="year-rows"><div class="yr"><span class="yr-k">Rides</span><span class="yr-v">3</span></div><div class="yr"><span class="yr-k">Distance</span><span class="yr-v">83.2 km</span></div><div class="yr"><span class="yr-k">Time</span><span class="yr-v">3h 22m</span></div><div class="yr"><span class="yr-k">Avg speed</span><span class="yr-v">24.7 km/h</span></div><div class="yr"><span class="yr-k">Top speed</span><span class="yr-v" style="color:var(--green)">49.0 km/h</span></div><div class="yr"><span class="yr-k">Longest</span><span class="yr-v">36.1 km</span></div></div></div>
+  </div>
+
+  <div class="stitle">2026 — Year to Date</div>
+  <div class="g3 mb">
+    <div class="year-card" style="border-top:2px solid var(--run)"><div class="card-title" style="color:var(--run)">2026 Overview</div><div class="year-rows"><div class="yr"><span class="yr-k">Activities</span><span class="yr-v">2</span></div><div class="yr"><span class="yr-k">Total distance</span><span class="yr-v">55.6 km</span></div><div class="yr"><span class="yr-k">Moving time</span><span class="yr-v">2h 31m</span></div><div class="yr"><span class="yr-k">Elevation</span><span class="yr-v">+86.9 m</span></div><div class="yr"><span class="yr-k">Avg HR</span><span class="yr-v" style="color:var(--z5)">179 bpm (Z5)</span></div></div></div>
+    <div class="year-card" style="border-top:2px solid var(--run)"><div class="card-title" style="color:var(--run)">2026 Running</div><div class="year-rows"><div class="yr"><span class="yr-k">Runs</span><span class="yr-v">1</span></div><div class="yr"><span class="yr-k">Distance</span><span class="yr-v">9.85 km</span></div><div class="yr"><span class="yr-k">Time</span><span class="yr-v">45:28</span></div><div class="yr"><span class="yr-k">Pace</span><span class="yr-v">4:37 /km</span></div><div class="yr"><span class="yr-k">Avg HR</span><span class="yr-v" style="color:var(--z5)">179 bpm (Z5)</span></div><div class="yr"><span class="yr-k">Avg Power</span><span class="yr-v" style="color:#e879f9">273 W</span></div></div></div>
+    <div class="year-card" style="border-top:2px solid var(--bike)"><div class="card-title" style="color:var(--bike)">2026 Cycling</div><div class="year-rows"><div class="yr"><span class="yr-k">Rides</span><span class="yr-v">1</span></div><div class="yr"><span class="yr-k">Distance</span><span class="yr-v">45.7 km</span></div><div class="yr"><span class="yr-k">Time</span><span class="yr-v">1h 45m</span></div><div class="yr"><span class="yr-k">Avg speed</span><span class="yr-v">26.1 km/h</span></div><div class="yr"><span class="yr-k">Max speed</span><span class="yr-v" style="color:var(--green)">48.5 km/h</span></div><div class="yr"><span class="yr-k">Heart rate</span><span class="yr-v" style="color:var(--muted)">no data</span></div></div></div>
+  </div>
+
+  <div class="stitle">Distance by Sport per Year</div>
+  <div class="card mb"><div style="height:220px;position:relative"><canvas id="yearChart"></canvas></div></div>
+
+  <div class="stitle">Key Insights</div>
+  <div class="g3" style="margin-bottom:0">
+    <div class="ins-card" style="--ic:var(--z5)"><div class="ins-title" style="color:var(--z5)">⚠️ Intensity imbalance</div><div class="ins-body">All HR-tracked runs are Z3–Z5. No easy Z1/Z2 running logged. Add slow runs below 141 bpm to build aerobic base and improve recovery between hard efforts.</div></div>
+    <div class="ins-card" style="--ic:var(--green)"><div class="ins-title" style="color:var(--green)">📈 Positive trends</div><div class="ins-body">Run pace improved 10s/km year-over-year. Power up +22% (224→273W). Longest ride grew from 36 to 46 km. All key performance indicators are moving in the right direction.</div></div>
+    <div class="ins-card" style="--ic:var(--bike)"><div class="ins-title" style="color:var(--bike)">💡 Add HR to cycling</div><div class="ins-body">0 of 4 rides have HR data — all logged via Strava App only. Wear your Apple Watch or Polar on rides to unlock zone analysis and full training load insight.</div></div>
+  </div>
+
+</div>
+
+</div><!-- /wrap -->
+<div style="text-align:center;padding:20px 0 10px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);margin-top:32px">
+  Strava · Apple Watch SE · Polar · Kailo + Claude
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA  (update this block on each sync)
+// ═══════════════════════════════════════════
+const SYNC = '2026-06-03';
+const ACTS = [
+  {id:'r1',date:'2025-06-07',name:'Afternoon Run',           type:'running',dist:9.997, time:2704,pace:4.505,hr:null, hrx:null,pwr:null, spd:null, elev:4.4,  dev:'Strava App'},
+  {id:'c1',date:'2025-06-12',name:'Race tegen de zon',       type:'cycling',dist:31.909,time:4434,pace:null, hr:null, hrx:null,pwr:null, spd:25.9, elev:39.0, dev:'Strava App'},
+  {id:'r2',date:'2025-06-22',name:'Morning Run',             type:'running',dist:5.564, time:1765,pace:5.288,hr:164.3,hrx:181, pwr:224.1,spd:null, elev:41.8, dev:'Apple Watch SE'},
+  {id:'c2',date:'2025-06-25',name:'Afternoon Ride',          type:'cycling',dist:36.133,time:5546,pace:null, hr:null, hrx:null,pwr:null, spd:23.5, elev:58.4, dev:'Strava App'},
+  {id:'c3',date:'2025-08-05',name:'Lunch Ride',              type:'cycling',dist:15.114,time:2144,pace:null, hr:null, hrx:null,pwr:null, spd:25.4, elev:20.1, dev:'Strava App'},
+  {id:'w1',date:'2025-10-23',name:'Namiddagtraining',        type:'workout',dist:0,     time:569, pace:null, hr:136.7,hrx:150, pwr:null, spd:null, elev:0,    dev:'Polar'},
+  {id:'c4',date:'2026-03-04',name:'Eindelijk genieten v zon',type:'cycling',dist:45.700,time:6313,pace:null, hr:null, hrx:null,pwr:null, spd:26.1, elev:75.6, dev:'Strava App'},
+  {id:'r3',date:'2026-05-31',name:'Afternoon Run',           type:'running',dist:9.854, time:2728,pace:4.615,hr:179,  hrx:189, pwr:273,  spd:null, elev:11.4, dev:'Apple Watch SE'},
+];
+
+const ZONES = [
+  {n:'Z1 Recovery', lo:0,   hi:141, c:'#22c55e'},
+  {n:'Z2 Easy',     lo:142, hi:163, c:'#84cc16'},
+  {n:'Z3 Tempo',    lo:164, hi:169, c:'#eab308'},
+  {n:'Z4 Threshold',lo:170, hi:177, c:'#f97316'},
+  {n:'Z5 VO₂max',  lo:178, hi:198, c:'#ef4444'},
+];
+const SCOL = {running:'#fb923c', cycling:'#38bdf8', workout:'#c084fc'};
+const SICO = {running:'🏃', cycling:'🚴', workout:'💪'};
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let filter = 'all';
+let sports = new Set(['running','cycling','workout']);
+
+function filtered() {
+  const now = new Date(SYNC);
+  const cuts = {'1w':7,'6w':42,'6m':182,'1y':365,'all':99999};
+  const cutoff = new Date(now - cuts[filter]*86400000);
+  return ACTS.filter(a => new Date(a.date) >= cutoff && sports.has(a.type));
+}
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+const p2s = d => { if(!d) return '—'; const m=Math.floor(d),s=Math.round((d-m)*60); return `${m}:${s.toString().padStart(2,'0')}`; };
+const t2s = s => { const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60; return h>0?`${h}:${m.toString().padStart(2,'0')}:${ss.toString().padStart(2,'0')}`:`${m}:${ss.toString().padStart(2,'0')}`; };
+const t2p = s => { const h=Math.floor(s/3600),m=Math.floor((s%3600)/60); return h>0?`${h}:${m.toString().padStart(2,'0')}h`:`${m}m`; };
+const zone = hr => hr ? ZONES.find(z => hr>=z.lo && hr<=z.hi)||ZONES[4] : null;
+const dFmt = d => new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'});
+
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function render() {
+  const acts = filtered();
+
+  // stat cards
+  const total = acts.length;
+  const cnt = {};
+  acts.forEach(a => cnt[a.type]=(cnt[a.type]||0)+1);
+  document.getElementById('s-acts').textContent = total;
+  document.getElementById('s-acts-s').textContent = Object.entries(cnt).map(([k,v])=>`${v} ${k}`).join(' · ') || '—';
+
+  const dist = acts.reduce((s,a)=>s+a.dist,0);
+  document.getElementById('s-dist').innerHTML = dist.toFixed(1)+'<span class="u">km</span>';
+  document.getElementById('s-dist-s').textContent = total+' activit'+(total===1?'y':'ies');
+
+  const time = acts.reduce((s,a)=>s+a.time,0);
+  document.getElementById('s-time').innerHTML = t2p(time)+'<span class="u"></span>';
+  document.getElementById('s-time-s').textContent = t2s(time)+' moving';
+
+  const hrActs = acts.filter(a=>a.hr);
+  const avgHR = hrActs.length ? Math.round(hrActs.reduce((s,a)=>s+a.hr,0)/hrActs.length) : null;
+  const z = avgHR ? zone(avgHR) : null;
+  document.getElementById('s-hr').innerHTML = (avgHR||'—')+'<span class="u">bpm</span>';
+  document.getElementById('s-hr').style.color = z ? z.c : 'var(--text)';
+  document.getElementById('s-hr-s').textContent = hrActs.length ? `${hrActs.length} act${hrActs.length===1?'':'s'} · ${z.n}` : 'No HR in period';
+
+  const runs = acts.filter(a=>a.type==='running'&&a.pace);
+  const bestPace = runs.length ? Math.min(...runs.map(r=>r.pace)) : null;
+  document.getElementById('s-pace').innerHTML = (bestPace?p2s(bestPace):'—')+'<span class="u">/km</span>';
+  document.getElementById('s-pace-s').textContent = bestPace ? 'fastest run in period' : 'no runs in period';
+
+  const elev = acts.reduce((s,a)=>s+a.elev,0);
+  document.getElementById('s-elev').innerHTML = Math.round(elev)+'<span class="u">m</span>';
+  document.getElementById('s-elev-s').textContent = 'total elevation gain';
+
+  // activity list
+  const sorted = [...acts].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  document.getElementById('actList').innerHTML = sorted.map(a=>{
+    const z = a.hr ? zone(a.hr) : null;
+    const mainVal = a.type==='running' ? p2s(a.pace)+'/km' : a.type==='cycling' ? (a.spd+' km/h') : '—';
+    const hrBadge = a.hr
+      ? `<div style="font-size:11px;font-weight:600;color:${z.c};background:${z.c}18;padding:3px 8px;border-radius:20px;flex-shrink:0">${Math.round(a.hr)} bpm · ${z.n.split(' ')[0]+' '+z.n.split(' ')[1]}</div>`
+      : `<div style="font-size:11px;color:var(--muted);background:rgba(255,255,255,.04);padding:3px 8px;border-radius:20px;flex-shrink:0">No HR</div>`;
+    return `<div class="act-row">
+      <div class="sport-pip" style="background:${SCOL[a.type]}"></div>
+      <div class="act-info">
+        <div class="act-nm">${a.name}</div>
+        <div class="act-dt">${dFmt(a.date)} · ${SICO[a.type]} · ${a.dev}</div>
+      </div>
+      <div class="act-nums">
+        <div class="anum"><div class="anum-v">${a.dist>0?a.dist.toFixed(1):'—'}</div><div class="anum-l">km</div></div>
+        <div class="anum"><div class="anum-v">${t2s(a.time)}</div><div class="anum-l">time</div></div>
+        <div class="anum"><div class="anum-v" style="color:${SCOL[a.type]}">${mainVal}</div><div class="anum-l">${a.type==='running'?'pace':'speed'}</div></div>
+      </div>
+      ${hrBadge}
+    </div>`;
+  }).join('');
+  document.getElementById('act-sub').textContent = `${total} activit${total===1?'y':'ies'} · ${filter==='all'?'all time':filter}`;
+
+  // zone reference
+  const hrAs = ACTS.filter(a=>a.hr);
+  document.getElementById('zoneRef').innerHTML = ZONES.map(z=>{
+    const inZ = hrAs.filter(a=>a.hr>=z.lo&&a.hr<=z.hi);
+    const tag = inZ.length ? `<span style="color:${z.c};font-size:11px;font-weight:600">${inZ.map(a=>a.name.split(' ').slice(0,2).join(' ')).join(', ')}</span>` : `<span style="color:var(--muted);font-size:11px">no activities</span>`;
+    return `<div class="zr"><div class="zr-dot" style="background:${z.c}"></div><span class="zr-name" style="color:${z.c}">${z.n}</span><span class="zr-bpm">${z.lo}–${z.hi} bpm</span>${tag}</div>`;
+  }).join('');
+
+  // zone tracks for HR activities
+  const hrActsAll = ACTS.filter(a=>a.hr);
+  document.getElementById('zoneTrackWrap').innerHTML = hrActsAll.map(a=>{
+    const z = zone(a.hr);
+    const pos = (a.hr/198*100).toFixed(1);
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+        <span style="color:var(--t2)">${a.name} <span style="color:var(--muted)">${dFmt(a.date)}</span></span>
+        <span style="color:${z.c};font-weight:600">${Math.round(a.hr)} bpm · ${z.n}</span>
+      </div>
+      <div class="zone-track"><div class="zone-needle" style="left:${pos}%;background:${z.c}"></div></div>
+    </div>`;
+  }).join('');
+
+  // charts
+  updateVolChart(acts);
+  updateDonut(acts);
+
+  // analysis counts
+  document.getElementById('run-cnt').textContent = ACTS.filter(a=>a.type==='running').length+' runs';
+  document.getElementById('bike-cnt').textContent = ACTS.filter(a=>a.type==='cycling').length+' rides';
+}
+
+// ═══════════════════════════════════════════
+// FILTER / SPORT TOGGLES
+// ═══════════════════════════════════════════
+function setF(f, btn) {
+  filter = f;
+  document.querySelectorAll('.fbtn').forEach(b => {
+    if(b.textContent.trim()===btn.textContent.trim()) b.classList.add('active');
+    else b.classList.remove('active');
+  });
+  render();
+}
+function toggleSport(s, btn) {
+  if(sports.has(s)) { if(sports.size===1) return; sports.delete(s); btn.classList.remove('on'); }
+  else { sports.add(s); btn.classList.add('on'); }
+  render();
+}
+
+// ═══════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════
+const DG = 'rgba(255,255,255,0.055)';
+Chart.defaults.color = '#475569';
+Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
+Chart.defaults.font.size = 11;
+
+let cVol, cDonut, cPace, cPower, cSpeed, cBikeDist, cYear;
+
+function mkChart(id, cfg) { return new Chart(document.getElementById(id), cfg); }
+
+function initCharts() {
+  // Volume
+  cVol = mkChart('volChart', {
+    type:'bar',
+    data:{ labels:[], datasets:[
+      {label:'Running', data:[], backgroundColor:'#fb923c88', borderColor:'#fb923c', borderWidth:1.5, borderRadius:5},
+      {label:'Cycling', data:[], backgroundColor:'#38bdf855', borderColor:'#38bdf8', borderWidth:1.5, borderRadius:5},
+      {label:'Workout', data:[], backgroundColor:'#c084fc44', borderColor:'#c084fc', borderWidth:1.5, borderRadius:5},
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ boxWidth:8, usePointStyle:true, padding:12 } } },
+      scales:{ x:{grid:{color:DG}}, y:{grid:{color:DG}, ticks:{callback:v=>v+' km'}, min:0} }
+    }
+  });
+
+  // Donut
+  cDonut = mkChart('donutChart', {
+    type:'doughnut',
+    data:{ labels:['Cycling','Running','Workout'], datasets:[{ data:[128.9,25.4,0], backgroundColor:['#38bdf8','#fb923c','#c084fc'], borderWidth:0, hoverOffset:5 }] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'72%',
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>`${c.label}: ${(+c.raw).toFixed(1)} km` } } }
+    }
+  });
+
+  // Pace
+  const runs = ACTS.filter(a=>a.type==='running');
+  cPace = mkChart('paceChart', {
+    type:'bar',
+    data:{ labels:runs.map(a=>dFmt(a.date)), datasets:[{
+      label:'Pace', data:runs.map(a=>a.pace),
+      backgroundColor:runs.map(a=>a.pace<4.6?'#22c55e44':a.pace<5.1?'#eab30844':'#ef444444'),
+      borderColor:runs.map(a=>a.pace<4.6?'#22c55e':a.pace<5.1?'#eab308':'#ef4444'),
+      borderWidth:2, borderRadius:5,
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>p2s(c.raw)+'/km'}} },
+      scales:{ x:{grid:{color:DG}}, y:{grid:{color:DG}, reverse:true, min:3.9, max:5.8, ticks:{callback:v=>p2s(v), stepSize:0.25}} }
+    }
+  });
+
+  // Power
+  cPower = mkChart('powerChart', {
+    type:'bar',
+    data:{ labels:runs.map(a=>dFmt(a.date)), datasets:[
+      {label:'Avg W', data:runs.map(a=>a.pwr), backgroundColor:'#c084fc44', borderColor:'#c084fc', borderWidth:2, borderRadius:5},
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>c.raw ? c.raw+' W' : '— no data'}} },
+      scales:{ x:{grid:{color:DG}}, y:{grid:{color:DG}, ticks:{callback:v=>v+' W'}, min:0} }
+    }
+  });
+
+  // Cycling speed
+  const bikes = ACTS.filter(a=>a.type==='cycling');
+  cSpeed = mkChart('speedChart', {
+    type:'bar',
+    data:{ labels:bikes.map(a=>dFmt(a.date)), datasets:[{
+      label:'km/h', data:bikes.map(a=>a.spd),
+      backgroundColor:'#38bdf844', borderColor:'#38bdf8', borderWidth:2, borderRadius:5,
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{ x:{grid:{color:DG}}, y:{grid:{color:DG}, min:18, max:30, ticks:{callback:v=>v+' km/h'}} }
+    }
+  });
+
+  // Cycling distance
+  cBikeDist = mkChart('bikeDistChart', {
+    type:'bar',
+    data:{ labels:bikes.map(a=>dFmt(a.date)), datasets:[{
+      label:'km', data:bikes.map(a=>a.dist.toFixed(1)),
+      backgroundColor:'#38bdf822', borderColor:'#38bdf8', borderWidth:2, borderRadius:5,
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{ x:{grid:{color:DG}}, y:{grid:{color:DG}, ticks:{callback:v=>v+' km'}, min:0} }
+    }
+  });
+
+  // Year stack
+  cYear = mkChart('yearChart', {
+    type:'bar',
+    data:{ labels:['2025','2026 YTD'], datasets:[
+      {label:'Cycling', data:[83.2,45.7], backgroundColor:'#38bdf866', borderColor:'#38bdf8', borderWidth:2, borderRadius:4},
+      {label:'Running', data:[15.6,9.85], backgroundColor:'#fb923c66', borderColor:'#fb923c', borderWidth:2, borderRadius:4},
+      {label:'Workout', data:[0,0],       backgroundColor:'#c084fc44', borderColor:'#c084fc', borderWidth:2, borderRadius:4},
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ boxWidth:8, usePointStyle:true, padding:14 } } },
+      scales:{ x:{grid:{color:DG},stacked:true}, y:{grid:{color:DG},stacked:true, ticks:{callback:v=>v+' km'}} }
+    }
+  });
+}
+
+function updateVolChart(acts) {
+  if(!cVol) return;
+  const s = [...acts].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  cVol.data.labels = s.map(a=>dFmt(a.date));
+  cVol.data.datasets[0].data = s.map(a=>a.type==='running'?a.dist:null);
+  cVol.data.datasets[1].data = s.map(a=>a.type==='cycling'?a.dist:null);
+  cVol.data.datasets[2].data = s.map(a=>a.type==='workout'?a.dist:null);
+  cVol.update();
+}
+function updateDonut(acts) {
+  if(!cDonut) return;
+  const byT = {cycling:0, running:0, workout:0};
+  acts.forEach(a => byT[a.type]=(byT[a.type]||0)+a.dist);
+  cDonut.data.datasets[0].data = [byT.cycling, byT.running, byT.workout];
+  cDonut.update();
+  const total = Object.values(byT).reduce((a,b)=>a+b,0);
+  document.getElementById('donutLegend').innerHTML = Object.entries(byT).map(([k,v])=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:12px">
+      <div style="width:9px;height:9px;border-radius:2px;background:${SCOL[k]};flex-shrink:0"></div>
+      <span style="color:var(--t2);text-transform:capitalize;flex:1">${k}</span>
+      <span style="font-weight:600">${v.toFixed(1)} km</span>
+      <span style="color:var(--muted);width:32px;text-align:right">${total>0?(v/total*100).toFixed(0):0}%</span>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  setTimeout(()=>[cVol,cDonut,cPace,cPower,cSpeed,cBikeDist,cYear].forEach(c=>c&&c.resize()), 50);
+}
+
+// ═══════════════════════════════════════════
+// SYNC INFO
+// ═══════════════════════════════════════════
+function syncInfo() {
+  alert('To sync latest Strava activities:\n\n1. Open a terminal\n2. Run: claude "refresh the sport dashboard with my latest Strava activities"\n\nA daily auto-sync can also be set up — ask Claude Code to schedule it.');
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => { initCharts(); render(); });
+</script>
+</body>
+</html>
