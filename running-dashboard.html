@@ -666,10 +666,11 @@ function render() {
     </div>`;
   }).join('');
 
-  // charts
+  // charts + reactive widgets
   updateVolChart(acts);
   updateDonut(acts);
   renderHRZoneDist();
+  renderPersonalBests();
 
   // analysis counts
   document.getElementById('run-cnt').textContent = ACTS.filter(a=>a.type==='running').length+' runs';
@@ -838,17 +839,25 @@ function switchTab(name, btn) {
 // ═══════════════════════════════════════════
 // PERSONAL BESTS
 // ═══════════════════════════════════════════
+// For each target, include all runs >= minKm, estimate finish time via avg pace × target
 const PB_CATS = [
-  { label:'1 km',  minKm:0.8,  maxKm:2.0  },
-  { label:'5 km',  minKm:4.0,  maxKm:7.0  },
-  { label:'10 km', minKm:8.0,  maxKm:13.0 },
+  { label:'1 km',  targetKm:1,  minKm:0.8 },
+  { label:'5 km',  targetKm:5,  minKm:4.5 },
+  { label:'10 km', targetKm:10, minKm:9.0 },
 ];
+
+function fmtFinish(sec) {
+  // Format total seconds as M:SS or H:MM:SS
+  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = Math.round(sec%60);
+  if (h > 0) return `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
 
 function renderPersonalBests() {
   const runs = ACTS.filter(a => a.type === 'running' && a.dist > 0 && a.time > 0);
 
   document.getElementById('pbCards').innerHTML = PB_CATS.map(cat => {
-    const qualifying = runs.filter(a => a.dist >= cat.minKm && a.dist <= cat.maxKm);
+    const qualifying = runs.filter(a => a.dist >= cat.minKm);
 
     if (!qualifying.length) {
       return `<div class="pb-card">
@@ -859,19 +868,21 @@ function renderPersonalBests() {
       </div>`;
     }
 
-    // lowest pace = fastest run
+    // Find the run with lowest avg pace (= fastest runner)
     const best = qualifying.reduce((champ, a) => {
-      const pace = (a.time / 60) / a.dist;
-      return pace < (champ.time / 60) / champ.dist ? a : champ;
+      return (a.time / a.dist) < (champ.time / champ.dist) ? a : champ;
     });
-    const bestPace = (best.time / 60) / best.dist;
+
+    const avgPace   = (best.time / 60) / best.dist;          // min/km
+    const estTimeSec = avgPace * 60 * cat.targetKm;           // estimated finish in seconds
+    const label     = cat.targetKm === 1 ? 'min' : 'min';
 
     return `<div class="pb-card">
       <div class="pb-dist">${cat.label}</div>
-      <div class="pb-pace">${p2s(bestPace)}<span class="pb-unit">/km</span></div>
+      <div class="pb-pace">${fmtFinish(estTimeSec)}<span class="pb-unit">min</span></div>
       <div class="pb-divider"></div>
       <div class="pb-name">${best.name}</div>
-      <div class="pb-meta">${dFmt(best.date)} · ${best.dist.toFixed(2)} km · ${t2s(best.time)}</div>
+      <div class="pb-meta">${dFmt(best.date)} · ${best.dist.toFixed(2)} km · avg ${p2s(avgPace)}/km</div>
     </div>`;
   }).join('');
 }
