@@ -203,6 +203,33 @@ body::after {
 .ins-title { font-size:13px; font-weight:600; margin-bottom:8px; }
 .ins-body { font-size:12px; color:var(--t2); line-height:1.65; }
 
+/* ── PERSONAL BESTS ── */
+.pb-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px; }
+.pb-card {
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:22px 20px; position:relative; overflow:hidden;
+  transition:border-color .2s, background .2s;
+}
+.pb-card:hover { border-color:var(--border-h); background:var(--card-h); }
+.pb-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, var(--run), transparent);
+}
+.pb-dist {
+  font-size:11px; text-transform:uppercase; letter-spacing:1.2px;
+  color:var(--muted); font-weight:600; margin-bottom:10px;
+}
+.pb-pace {
+  font-size:38px; font-weight:700; letter-spacing:-1.5px; line-height:1;
+  color:var(--run); margin-bottom:12px;
+}
+.pb-pace .pb-unit { font-size:14px; font-weight:400; color:var(--t2); margin-left:3px; letter-spacing:0; }
+.pb-empty { font-size:32px; font-weight:700; color:var(--muted); margin-bottom:12px; }
+.pb-divider { height:1px; background:var(--border); margin-bottom:10px; }
+.pb-name { font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pb-meta { font-size:11px; color:var(--muted); margin-top:4px; }
+.pb-nodata { font-size:12px; color:var(--muted); font-style:italic; }
+
 /* ── HR ZONE DISTRIBUTION ── */
 .hzd-wrap { margin-bottom: 18px; }
 .hzd-bar {
@@ -371,6 +398,10 @@ body::after {
     <button class="fbtn" onclick="setF('1y',this)">1 Year</button>
     <button class="fbtn active" onclick="setF('all',this)">All Time</button>
   </div>
+
+  <!-- Personal Bests -->
+  <div class="stitle">Personal Bests — All Time</div>
+  <div class="pb-grid" id="pbCards"></div>
 
   <div class="sport-hdr"><div class="sport-bar" style="background:var(--run)"></div><span class="sport-hdr-title">Running</span><span class="sport-cnt" id="run-cnt">3 runs</span></div>
   <div class="g2 mb">
@@ -805,6 +836,47 @@ function switchTab(name, btn) {
 }
 
 // ═══════════════════════════════════════════
+// PERSONAL BESTS
+// ═══════════════════════════════════════════
+const PB_CATS = [
+  { label:'1 km',  minKm:0.8,  maxKm:2.0  },
+  { label:'5 km',  minKm:4.0,  maxKm:7.0  },
+  { label:'10 km', minKm:8.0,  maxKm:13.0 },
+];
+
+function renderPersonalBests() {
+  const runs = ACTS.filter(a => a.type === 'running' && a.dist > 0 && a.time > 0);
+
+  document.getElementById('pbCards').innerHTML = PB_CATS.map(cat => {
+    const qualifying = runs.filter(a => a.dist >= cat.minKm && a.dist <= cat.maxKm);
+
+    if (!qualifying.length) {
+      return `<div class="pb-card">
+        <div class="pb-dist">${cat.label}</div>
+        <div class="pb-empty">—</div>
+        <div class="pb-divider"></div>
+        <div class="pb-nodata">no qualifying run yet</div>
+      </div>`;
+    }
+
+    // lowest pace = fastest run
+    const best = qualifying.reduce((champ, a) => {
+      const pace = (a.time / 60) / a.dist;
+      return pace < (champ.time / 60) / champ.dist ? a : champ;
+    });
+    const bestPace = (best.time / 60) / best.dist;
+
+    return `<div class="pb-card">
+      <div class="pb-dist">${cat.label}</div>
+      <div class="pb-pace">${p2s(bestPace)}<span class="pb-unit">/km</span></div>
+      <div class="pb-divider"></div>
+      <div class="pb-name">${best.name}</div>
+      <div class="pb-meta">${dFmt(best.date)} · ${best.dist.toFixed(2)} km · ${t2s(best.time)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
 // HR ZONE DISTRIBUTION
 // ═══════════════════════════════════════════
 const HZD_ZONES = [
@@ -1157,7 +1229,7 @@ function syncInfo() {
 // ═══════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => { initCharts(); render(); renderYearStats(); renderTrainingLoad(); renderHRZoneDist(); });
+document.addEventListener('DOMContentLoaded', () => { initCharts(); render(); renderYearStats(); renderTrainingLoad(); renderHRZoneDist(); renderPersonalBests(); });
 </script>
 </body>
 </html>
