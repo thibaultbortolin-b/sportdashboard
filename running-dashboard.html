@@ -203,6 +203,35 @@ body::after {
 .ins-title { font-size:13px; font-weight:600; margin-bottom:8px; }
 .ins-body { font-size:12px; color:var(--t2); line-height:1.65; }
 
+/* ── HR ZONE DISTRIBUTION ── */
+.hzd-wrap { margin-bottom: 18px; }
+.hzd-bar {
+  height: 36px; border-radius: 9px; overflow: hidden;
+  display: flex; gap: 2px; background: rgba(255,255,255,.04);
+  margin-bottom: 12px;
+}
+.hzd-seg {
+  display: flex; align-items: center; justify-content: center;
+  transition: width .5s ease; overflow: hidden; border-radius: 2px;
+  min-width: 0;
+}
+.hzd-seg-lbl { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.9); white-space: nowrap; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
+.hzd-cards { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; }
+.hzd-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 11px;
+  padding: 13px 12px; text-align: center;
+  border-top: 2px solid var(--hz-c, var(--border-h));
+  transition: border-color .2s, background .2s;
+}
+.hzd-card:hover { background: var(--card-h); }
+.hzd-ztag  { font-size: 12px; font-weight: 700; color: var(--hz-c); margin-bottom: 2px; }
+.hzd-zname { font-size: 10px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 9px; }
+.hzd-range { font-size: 10px; color: var(--muted); margin-bottom: 8px; }
+.hzd-mins  { font-size: 22px; font-weight: 700; color: var(--hz-c); line-height: 1; }
+.hzd-mins span { font-size: 11px; font-weight: 400; color: var(--muted); margin-left: 2px; }
+.hzd-pct   { font-size: 12px; color: var(--t2); margin-top: 5px; font-weight: 600; }
+.hzd-empty { text-align: center; padding: 24px; font-size: 13px; color: var(--muted); }
+
 /* ── TRAINING LOAD ── */
 .tl-info {
   display:flex; align-items:center; gap:20px; flex-wrap:wrap;
@@ -297,6 +326,21 @@ body::after {
       <div class="zref" id="zoneRef"></div>
       <div style="height:1px;background:var(--border);margin:14px 0"></div>
       <div id="zoneTrackWrap"></div>
+    </div>
+  </div>
+
+  <!-- HR Zone Distribution -->
+  <div class="card mb">
+    <div class="card-hd">
+      <div>
+        <div class="card-title">HR Zone Distribution</div>
+        <div class="card-sub" id="hzd-sub">Last 28 days · runs &amp; rides with HR data</div>
+      </div>
+      <div id="hzd-total" style="font-size:12px;color:var(--muted)"></div>
+    </div>
+    <div class="hzd-wrap">
+      <div class="hzd-bar" id="hzdBar"></div>
+      <div class="hzd-cards" id="hzdCards"></div>
     </div>
   </div>
 
@@ -594,6 +638,7 @@ function render() {
   // charts
   updateVolChart(acts);
   updateDonut(acts);
+  renderHRZoneDist();
 
   // analysis counts
   document.getElementById('run-cnt').textContent = ACTS.filter(a=>a.type==='running').length+' runs';
@@ -757,6 +802,77 @@ function switchTab(name, btn) {
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
   setTimeout(()=>[cVol,cDonut,cPace,cPower,cSpeed,cBikeDist,cYear,cTL].forEach(c=>c&&c.resize()), 50);
+}
+
+// ═══════════════════════════════════════════
+// HR ZONE DISTRIBUTION
+// ═══════════════════════════════════════════
+const HZD_ZONES = [
+  { id:'Z1', name:'Recovery',  lo:0,   hi:118,      color:'#64748b', bg:'rgba(100,116,139,.15)' },
+  { id:'Z2', name:'Aerobic',   lo:118, hi:138,      color:'#38bdf8', bg:'rgba(56,189,248,.15)'  },
+  { id:'Z3', name:'Tempo',     lo:138, hi:158,      color:'#22c55e', bg:'rgba(34,197,94,.15)'   },
+  { id:'Z4', name:'Threshold', lo:158, hi:178,      color:'#eab308', bg:'rgba(234,179,8,.15)'   },
+  { id:'Z5', name:'Max',       lo:178, hi:Infinity, color:'#ef4444', bg:'rgba(239,68,68,.15)'   },
+];
+
+function renderHRZoneDist() {
+  const now    = new Date(SYNC);
+  const cutoff = new Date(+now - 28 * 86400000);
+
+  // Only runs + cycling with HR, in last 28 days
+  const acts = ACTS.filter(a =>
+    new Date(a.date) >= cutoff &&
+    a.hr &&
+    (a.type === 'running' || a.type === 'cycling')
+  );
+
+  const bar   = document.getElementById('hzdBar');
+  const cards = document.getElementById('hzdCards');
+  const sub   = document.getElementById('hzd-sub');
+  const tot   = document.getElementById('hzd-total');
+
+  if (!acts.length) {
+    bar.innerHTML   = `<div class="hzd-empty" style="width:100%">No HR data in the last 28 days</div>`;
+    cards.innerHTML = '';
+    tot.textContent = '';
+    return;
+  }
+
+  // Assign each activity's full duration to its avg-HR zone
+  const zoneSec = HZD_ZONES.map(() => 0);
+  let totalSec  = 0;
+  acts.forEach(a => {
+    const idx = HZD_ZONES.findIndex(z => a.hr >= z.lo && a.hr < z.hi);
+    if (idx >= 0) { zoneSec[idx] += a.time; totalSec += a.time; }
+  });
+
+  const totalMin = Math.round(totalSec / 60);
+  sub.textContent = `Last 28 days · ${acts.length} activit${acts.length === 1 ? 'y' : 'ies'} with HR data`;
+  tot.textContent = `${totalMin} min total`;
+
+  // Stacked bar
+  bar.innerHTML = HZD_ZONES.map((z, i) => {
+    const pct = totalSec > 0 ? zoneSec[i] / totalSec * 100 : 0;
+    if (pct < 0.3) return '';
+    const showLabel = pct >= 7;
+    return `<div class="hzd-seg" style="width:${pct}%;background:${z.color}" title="${z.id} ${z.name}: ${pct.toFixed(1)}%">
+      ${showLabel ? `<span class="hzd-seg-lbl">${z.id} ${pct.toFixed(0)}%</span>` : ''}
+    </div>`;
+  }).join('');
+
+  // Zone cards
+  cards.innerHTML = HZD_ZONES.map((z, i) => {
+    const mins = Math.round(zoneSec[i] / 60);
+    const pct  = totalSec > 0 ? (zoneSec[i] / totalSec * 100) : 0;
+    const range = z.hi === Infinity ? `> ${z.lo} bpm` : `${z.lo}–${z.hi} bpm`;
+    return `<div class="hzd-card" style="--hz-c:${z.color}">
+      <div class="hzd-ztag">${z.id}</div>
+      <div class="hzd-zname">${z.name}</div>
+      <div class="hzd-range">${range}</div>
+      <div class="hzd-mins">${mins}<span>min</span></div>
+      <div class="hzd-pct">${pct > 0 ? pct.toFixed(1) + '%' : '—'}</div>
+    </div>`;
+  }).join('');
 }
 
 // ═══════════════════════════════════════════
@@ -1040,7 +1156,7 @@ function syncInfo() {
 // ═══════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => { initCharts(); render(); renderYearStats(); renderTrainingLoad(); });
+document.addEventListener('DOMContentLoaded', () => { initCharts(); render(); renderYearStats(); renderTrainingLoad(); renderHRZoneDist(); });
 </script>
 </body>
 </html>
