@@ -808,11 +808,11 @@ function switchTab(name, btn) {
 // HR ZONE DISTRIBUTION
 // ═══════════════════════════════════════════
 const HZD_ZONES = [
-  { id:'Z1', name:'Recovery',  lo:0,   hi:118,      color:'#64748b', bg:'rgba(100,116,139,.15)' },
-  { id:'Z2', name:'Aerobic',   lo:118, hi:138,      color:'#38bdf8', bg:'rgba(56,189,248,.15)'  },
-  { id:'Z3', name:'Tempo',     lo:138, hi:158,      color:'#22c55e', bg:'rgba(34,197,94,.15)'   },
-  { id:'Z4', name:'Threshold', lo:158, hi:178,      color:'#eab308', bg:'rgba(234,179,8,.15)'   },
-  { id:'Z5', name:'Max',       lo:178, hi:Infinity, color:'#ef4444', bg:'rgba(239,68,68,.15)'   },
+  { id:'Z1', name:'Recovery',  lo:0,   hi:142,      color:'#64748b', bg:'rgba(100,116,139,.15)' },
+  { id:'Z2', name:'Easy',      lo:142, hi:164,      color:'#38bdf8', bg:'rgba(56,189,248,.15)'  },
+  { id:'Z3', name:'Tempo',     lo:164, hi:170,      color:'#22c55e', bg:'rgba(34,197,94,.15)'   },
+  { id:'Z4', name:'Threshold', lo:170, hi:178,      color:'#eab308', bg:'rgba(234,179,8,.15)'   },
+  { id:'Z5', name:'VO₂max',   lo:178, hi:Infinity, color:'#ef4444', bg:'rgba(239,68,68,.15)'   },
 ];
 
 function renderHRZoneDist() {
@@ -864,7 +864,8 @@ function renderHRZoneDist() {
   cards.innerHTML = HZD_ZONES.map((z, i) => {
     const mins = Math.round(zoneSec[i] / 60);
     const pct  = totalSec > 0 ? (zoneSec[i] / totalSec * 100) : 0;
-    const range = z.hi === Infinity ? `> ${z.lo} bpm` : `${z.lo}–${z.hi} bpm`;
+    const ranges = ['≤ 141 bpm','142–163 bpm','164–169 bpm','170–177 bpm','178–198 bpm'];
+    const range  = ranges[i];
     return `<div class="hzd-card" style="--hz-c:${z.color}">
       <div class="hzd-ztag">${z.id}</div>
       <div class="hzd-zname">${z.name}</div>
