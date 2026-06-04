@@ -335,17 +335,8 @@ body::after {
   <div class="sport-hdr"><div class="sport-bar" style="background:var(--t2)"></div><span class="sport-hdr-title">All Sports — Year Comparison</span></div>
   <div class="card mb">
     <table class="ctbl">
-      <thead><tr><th>Metric</th><th>2025 (full year)</th><th>2026 (to date)</th><th>Trend</th></tr></thead>
-      <tbody>
-        <tr><td>Activities</td><td class="y25">6</td><td class="y26">2</td><td class="neu">—</td></tr>
-        <tr><td>Total distance</td><td class="y25">98.7 km</td><td class="y26">55.6 km</td><td class="neu">—</td></tr>
-        <tr><td>Total moving time</td><td class="y25">4h 46m</td><td class="y26">2h 31m</td><td class="neu">—</td></tr>
-        <tr><td>Running pace (avg)</td><td class="y25">4:47 /km</td><td class="y26">4:37 /km</td><td class="up">↑ 10s faster</td></tr>
-        <tr><td>Running power (avg)</td><td class="y25">224 W</td><td class="y26">273 W</td><td class="up">↑ +49W (+22%)</td></tr>
-        <tr><td>Cycling avg speed</td><td class="y25">24.7 km/h</td><td class="y26">26.1 km/h</td><td class="up">↑ +1.4 km/h</td></tr>
-        <tr><td>Longest ride</td><td class="y25">36.1 km</td><td class="y26">45.7 km</td><td class="up">↑ +9.6 km</td></tr>
-        <tr><td>Avg HR (HR acts only)</td><td class="y25">150.5 bpm</td><td class="y26">179 bpm</td><td class="dn">↑ much higher intensity</td></tr>
-      </tbody>
+      <thead><tr><th>Metric</th><th id="cmp-y1-hd">2025 (full year)</th><th id="cmp-y2-hd">2026 (to date)</th><th>Trend</th></tr></thead>
+      <tbody id="yearTbody"></tbody>
     </table>
   </div>
 
@@ -362,19 +353,11 @@ body::after {
     <div class="best-card"><div class="best-ico">⚡</div><div class="best-val" style="color:#e879f9">384 W</div><div class="best-lbl">Peak running power</div><div class="best-ctx">Afternoon Run · May 31, 2026</div></div>
   </div>
 
-  <div class="stitle">2025 — Full Year</div>
-  <div class="g3 mb">
-    <div class="year-card" style="border-top:2px solid var(--bike)"><div class="card-title" style="color:var(--bike)">2025 Overview</div><div class="year-rows"><div class="yr"><span class="yr-k">Activities</span><span class="yr-v">6</span></div><div class="yr"><span class="yr-k">Total distance</span><span class="yr-v">98.7 km</span></div><div class="yr"><span class="yr-k">Moving time</span><span class="yr-v">4h 46m</span></div><div class="yr"><span class="yr-k">Elevation</span><span class="yr-v">+163.7 m</span></div><div class="yr"><span class="yr-k">Avg HR (HR acts)</span><span class="yr-v">150.5 bpm</span></div></div></div>
-    <div class="year-card" style="border-top:2px solid var(--run)"><div class="card-title" style="color:var(--run)">2025 Running</div><div class="year-rows"><div class="yr"><span class="yr-k">Runs</span><span class="yr-v">2</span></div><div class="yr"><span class="yr-k">Distance</span><span class="yr-v">15.6 km</span></div><div class="yr"><span class="yr-k">Time</span><span class="yr-v">1h 14m</span></div><div class="yr"><span class="yr-k">Avg pace</span><span class="yr-v">4:47 /km</span></div><div class="yr"><span class="yr-k">Best pace</span><span class="yr-v" style="color:var(--green)">4:30 /km</span></div><div class="yr"><span class="yr-k">Avg HR</span><span class="yr-v">164 bpm (Z3)</span></div></div></div>
-    <div class="year-card" style="border-top:2px solid var(--bike)"><div class="card-title" style="color:var(--bike)">2025 Cycling</div><div class="year-rows"><div class="yr"><span class="yr-k">Rides</span><span class="yr-v">3</span></div><div class="yr"><span class="yr-k">Distance</span><span class="yr-v">83.2 km</span></div><div class="yr"><span class="yr-k">Time</span><span class="yr-v">3h 22m</span></div><div class="yr"><span class="yr-k">Avg speed</span><span class="yr-v">24.7 km/h</span></div><div class="yr"><span class="yr-k">Top speed</span><span class="yr-v" style="color:var(--green)">49.0 km/h</span></div><div class="yr"><span class="yr-k">Longest</span><span class="yr-v">36.1 km</span></div></div></div>
-  </div>
+  <div class="stitle" id="stitle-y1">2025 — Full Year</div>
+  <div class="g3 mb" id="cards-y1"></div>
 
-  <div class="stitle">2026 — Year to Date</div>
-  <div class="g3 mb">
-    <div class="year-card" style="border-top:2px solid var(--run)"><div class="card-title" style="color:var(--run)">2026 Overview</div><div class="year-rows"><div class="yr"><span class="yr-k">Activities</span><span class="yr-v">2</span></div><div class="yr"><span class="yr-k">Total distance</span><span class="yr-v">55.6 km</span></div><div class="yr"><span class="yr-k">Moving time</span><span class="yr-v">2h 31m</span></div><div class="yr"><span class="yr-k">Elevation</span><span class="yr-v">+86.9 m</span></div><div class="yr"><span class="yr-k">Avg HR</span><span class="yr-v" style="color:var(--z5)">179 bpm (Z5)</span></div></div></div>
-    <div class="year-card" style="border-top:2px solid var(--run)"><div class="card-title" style="color:var(--run)">2026 Running</div><div class="year-rows"><div class="yr"><span class="yr-k">Runs</span><span class="yr-v">1</span></div><div class="yr"><span class="yr-k">Distance</span><span class="yr-v">9.85 km</span></div><div class="yr"><span class="yr-k">Time</span><span class="yr-v">45:28</span></div><div class="yr"><span class="yr-k">Pace</span><span class="yr-v">4:37 /km</span></div><div class="yr"><span class="yr-k">Avg HR</span><span class="yr-v" style="color:var(--z5)">179 bpm (Z5)</span></div><div class="yr"><span class="yr-k">Avg Power</span><span class="yr-v" style="color:#e879f9">273 W</span></div></div></div>
-    <div class="year-card" style="border-top:2px solid var(--bike)"><div class="card-title" style="color:var(--bike)">2026 Cycling</div><div class="year-rows"><div class="yr"><span class="yr-k">Rides</span><span class="yr-v">1</span></div><div class="yr"><span class="yr-k">Distance</span><span class="yr-v">45.7 km</span></div><div class="yr"><span class="yr-k">Time</span><span class="yr-v">1h 45m</span></div><div class="yr"><span class="yr-k">Avg speed</span><span class="yr-v">26.1 km/h</span></div><div class="yr"><span class="yr-k">Max speed</span><span class="yr-v" style="color:var(--green)">48.5 km/h</span></div><div class="yr"><span class="yr-k">Heart rate</span><span class="yr-v" style="color:var(--muted)">no data</span></div></div></div>
-  </div>
+  <div class="stitle" id="stitle-y2">2026 — Year to Date</div>
+  <div class="g3 mb" id="cards-y2"></div>
 
   <div class="stitle">Distance by Sport per Year</div>
   <div class="card mb"><div style="height:220px;position:relative"><canvas id="yearChart"></canvas></div></div>
@@ -643,13 +626,13 @@ function initCharts() {
     }
   });
 
-  // Year stack
+  // Year stack (data filled by renderYearStats)
   cYear = mkChart('yearChart', {
     type:'bar',
-    data:{ labels:['2025','2026 YTD'], datasets:[
-      {label:'Cycling', data:[83.2,45.7], backgroundColor:'#38bdf866', borderColor:'#38bdf8', borderWidth:2, borderRadius:4},
-      {label:'Running', data:[15.6,9.85], backgroundColor:'#fb923c66', borderColor:'#fb923c', borderWidth:2, borderRadius:4},
-      {label:'Workout', data:[0,0],       backgroundColor:'#c084fc44', borderColor:'#c084fc', borderWidth:2, borderRadius:4},
+    data:{ labels:[], datasets:[
+      {label:'Cycling', data:[], backgroundColor:'#38bdf866', borderColor:'#38bdf8', borderWidth:2, borderRadius:4},
+      {label:'Running', data:[], backgroundColor:'#fb923c66', borderColor:'#fb923c', borderWidth:2, borderRadius:4},
+      {label:'Workout', data:[], backgroundColor:'#c084fc44', borderColor:'#c084fc', borderWidth:2, borderRadius:4},
     ]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{ labels:{ boxWidth:8, usePointStyle:true, padding:14 } } },
@@ -695,6 +678,133 @@ function switchTab(name, btn) {
 }
 
 // ═══════════════════════════════════════════
+// YEAR STATS (fully dynamic from ACTS)
+// ═══════════════════════════════════════════
+function ys(acts) {
+  const runs  = acts.filter(a=>a.type==='running');
+  const bikes = acts.filter(a=>a.type==='cycling');
+  const works = acts.filter(a=>a.type==='workout');
+  const hrA   = acts.filter(a=>a.hr);
+  const runHR = runs.filter(a=>a.hr);
+  const runDist = runs.reduce((s,a)=>s+a.dist,0);
+  const runTime = runs.reduce((s,a)=>s+a.time,0);
+  const bikeSpdA = bikes.filter(a=>a.spd);
+  return {
+    acts, runs, bikes, works,
+    totalDist : acts.reduce((s,a)=>s+a.dist,0),
+    totalTime : acts.reduce((s,a)=>s+a.time,0),
+    totalElev : acts.reduce((s,a)=>s+a.elev,0),
+    avgHR     : hrA.length ? hrA.reduce((s,a)=>s+a.hr,0)/hrA.length : null,
+    runDist, runTime,
+    runAvgPace: runDist>0 ? (runTime/60)/runDist : null,
+    runBestPace: runs.filter(a=>a.pace).length ? Math.min(...runs.filter(a=>a.pace).map(a=>a.pace)) : null,
+    runAvgHR  : runHR.length ? runHR.reduce((s,a)=>s+a.hr,0)/runHR.length : null,
+    runAvgPwr : (() => { const p=runs.filter(a=>a.pwr); return p.length ? p.reduce((s,a)=>s+a.pwr,0)/p.length : null; })(),
+    bikeDist  : bikes.reduce((s,a)=>s+a.dist,0),
+    bikeTime  : bikes.reduce((s,a)=>s+a.time,0),
+    bikeAvgSpd: bikeSpdA.length ? bikeSpdA.reduce((s,a)=>s+a.spd,0)/bikeSpdA.length : null,
+    bikeLongest: bikes.length ? Math.max(...bikes.map(a=>a.dist)) : null,
+  };
+}
+
+function yr(k,v,style='') { return `<div class="yr"><span class="yr-k">${k}</span><span class="yr-v"${style?` style="${style}"`:''}>${v}</span></div>`; }
+function ycard(title,color,rows) { return `<div class="year-card" style="border-top:2px solid ${color}"><div class="card-title" style="color:${color}">${title}</div><div class="year-rows">${rows}</div></div>`; }
+
+function renderYearStats() {
+  const years = [...new Set(ACTS.map(a=>a.date.slice(0,4)))].sort();
+  const thisYear = new Date(SYNC).getFullYear().toString();
+  const prevYear = (parseInt(thisYear)-1).toString();
+  const y1acts = ACTS.filter(a=>a.date.startsWith(prevYear));
+  const y2acts = ACTS.filter(a=>a.date.startsWith(thisYear));
+  const s1 = ys(y1acts), s2 = ys(y2acts);
+
+  // section titles
+  document.getElementById('stitle-y1').childNodes[0].textContent = `${prevYear} — Full Year`;
+  document.getElementById('stitle-y2').childNodes[0].textContent = `${thisYear} — Year to Date`;
+
+  // helper: zone label for HR
+  const zl = hr => { if(!hr) return '—'; const z=zone(hr); return `${Math.round(hr)} bpm (${z.n.split(' ')[0]+' '+z.n.split(' ')[1]})`; };
+  const zc = hr => { if(!hr) return ''; const z=zone(hr); return `color:${z.c}`; };
+
+  // 2025 cards
+  document.getElementById('cards-y1').innerHTML =
+    ycard(`${prevYear} Overview`, 'var(--bike)',
+      yr('Activities', s1.acts.length) +
+      yr('Total distance', s1.totalDist.toFixed(1)+' km') +
+      yr('Moving time', t2p(s1.totalTime)) +
+      yr('Elevation', '+'+Math.round(s1.totalElev)+' m') +
+      yr('Avg HR (HR acts)', s1.avgHR ? zl(s1.avgHR) : '—', s1.avgHR ? zc(s1.avgHR) : '')) +
+    ycard(`${prevYear} Running`, 'var(--run)',
+      yr('Runs', s1.runs.length) +
+      yr('Distance', s1.runDist.toFixed(1)+' km') +
+      yr('Time', t2p(s1.runTime)) +
+      yr('Avg pace', s1.runAvgPace ? p2s(s1.runAvgPace)+' /km' : '—') +
+      yr('Best pace', s1.runBestPace ? p2s(s1.runBestPace)+' /km' : '—', 'color:var(--green)') +
+      yr('Avg HR', s1.runAvgHR ? zl(s1.runAvgHR) : '—', s1.runAvgHR ? zc(s1.runAvgHR) : '')) +
+    ycard(`${prevYear} Cycling`, 'var(--bike)',
+      yr('Rides', s1.bikes.length) +
+      yr('Distance', s1.bikeDist.toFixed(1)+' km') +
+      yr('Time', t2p(s1.bikeTime)) +
+      yr('Avg speed', s1.bikeAvgSpd ? s1.bikeAvgSpd.toFixed(1)+' km/h' : '—') +
+      yr('Longest', s1.bikeLongest ? s1.bikeLongest.toFixed(1)+' km' : '—'));
+
+  // 2026 cards
+  document.getElementById('cards-y2').innerHTML =
+    ycard(`${thisYear} Overview`, 'var(--run)',
+      yr('Activities', s2.acts.length) +
+      yr('Total distance', s2.totalDist.toFixed(1)+' km') +
+      yr('Moving time', t2p(s2.totalTime)) +
+      yr('Elevation', '+'+Math.round(s2.totalElev)+' m') +
+      yr('Avg HR (HR acts)', s2.avgHR ? zl(s2.avgHR) : '—', s2.avgHR ? zc(s2.avgHR) : '')) +
+    ycard(`${thisYear} Running`, 'var(--run)',
+      yr('Runs', s2.runs.length) +
+      yr('Distance', s2.runDist.toFixed(1)+' km') +
+      yr('Time', t2p(s2.runTime)) +
+      yr('Avg pace', s2.runAvgPace ? p2s(s2.runAvgPace)+' /km' : '—') +
+      yr('Best pace', s2.runBestPace ? p2s(s2.runBestPace)+' /km' : '—', 'color:var(--green)') +
+      yr('Avg HR', s2.runAvgHR ? zl(s2.runAvgHR) : '—', s2.runAvgHR ? zc(s2.runAvgHR) : '') +
+      yr('Avg Power', s2.runAvgPwr ? Math.round(s2.runAvgPwr)+' W' : '—', 'color:#e879f9')) +
+    ycard(`${thisYear} Cycling`, 'var(--bike)',
+      yr('Rides', s2.bikes.length) +
+      yr('Distance', s2.bikeDist.toFixed(1)+' km') +
+      yr('Time', t2p(s2.bikeTime)) +
+      yr('Avg speed', s2.bikeAvgSpd ? s2.bikeAvgSpd.toFixed(1)+' km/h' : '—') +
+      yr('Longest', s2.bikeLongest ? s2.bikeLongest.toFixed(1)+' km' : '—'));
+
+  // comparison table
+  const td = (v,cls='') => `<td${cls?' class="'+cls+'"':''}>${v}</td>`;
+  const trend = (v1,v2,better='higher',unit='',dec=1) => {
+    if(v1==null||v2==null) return `<td class="neu">—</td>`;
+    const diff = v2-v1, pct = Math.abs(diff/v1*100).toFixed(0);
+    const improved = better==='higher' ? diff>0 : diff<0;
+    const cls = diff===0 ? 'neu' : improved ? 'up' : 'dn';
+    const sign = diff>0?'+':'';
+    return `<td class="${cls}">${improved?'↑':'↓'} ${sign}${Math.abs(diff).toFixed(dec)}${unit} (${pct}%)</td>`;
+  };
+  const trendRaw = (label, improved, txt) => `<td class="${improved?'up':'dn'}">${txt}</td>`;
+
+  document.getElementById('yearTbody').innerHTML = `
+    <tr>${td('Activities')}${td(s1.acts.length,'y25')}${td(s2.acts.length,'y26')}${td('—','neu')}</tr>
+    <tr>${td('Total distance')}${td(s1.totalDist.toFixed(1)+' km','y25')}${td(s2.totalDist.toFixed(1)+' km','y26')}${td('—','neu')}</tr>
+    <tr>${td('Total moving time')}${td(t2p(s1.totalTime),'y25')}${td(t2p(s2.totalTime),'y26')}${td('—','neu')}</tr>
+    <tr>${td('Running pace (avg)')}${td(s1.runAvgPace?p2s(s1.runAvgPace)+' /km':'—','y25')}${td(s2.runAvgPace?p2s(s2.runAvgPace)+' /km':'—','y26')}${s1.runAvgPace&&s2.runAvgPace ? trendRaw('pace', s2.runAvgPace<s1.runAvgPace, (s2.runAvgPace<s1.runAvgPace?'↑ ':'↓ ')+Math.abs(Math.round((s2.runAvgPace-s1.runAvgPace)*60))+'s/km') : td('—','neu')}</tr>
+    <tr>${td('Running power (avg)')}${td(s1.runAvgPwr?Math.round(s1.runAvgPwr)+' W':'—','y25')}${td(s2.runAvgPwr?Math.round(s2.runAvgPwr)+' W':'—','y26')}${s1.runAvgPwr&&s2.runAvgPwr ? trend(s1.runAvgPwr,s2.runAvgPwr,'higher',' W',0) : td('—','neu')}</tr>
+    <tr>${td('Cycling avg speed')}${td(s1.bikeAvgSpd?s1.bikeAvgSpd.toFixed(1)+' km/h':'—','y25')}${td(s2.bikeAvgSpd?s2.bikeAvgSpd.toFixed(1)+' km/h':'—','y26')}${s1.bikeAvgSpd&&s2.bikeAvgSpd ? trend(s1.bikeAvgSpd,s2.bikeAvgSpd,'higher',' km/h',1) : td('—','neu')}</tr>
+    <tr>${td('Longest ride')}${td(s1.bikeLongest?s1.bikeLongest.toFixed(1)+' km':'—','y25')}${td(s2.bikeLongest?s2.bikeLongest.toFixed(1)+' km':'—','y26')}${s1.bikeLongest&&s2.bikeLongest ? trend(s1.bikeLongest,s2.bikeLongest,'higher',' km',1) : td('—','neu')}</tr>
+    <tr>${td('Avg HR (HR acts only)')}${td(s1.avgHR?Math.round(s1.avgHR)+' bpm':'—','y25')}${td(s2.avgHR?Math.round(s2.avgHR)+' bpm':'—','y26')}${s1.avgHR&&s2.avgHR ? trendRaw('hr', false, (s2.avgHR>s1.avgHR?'↑ ':'↓ ')+Math.abs(Math.round(s2.avgHR-s1.avgHR))+' bpm higher') : td('—','neu')}</tr>`;
+
+  // year chart
+  if(cYear) {
+    const allYears = [...new Set(ACTS.map(a=>a.date.slice(0,4)))].sort();
+    cYear.data.labels = allYears.map(y => y===thisYear ? y+' YTD' : y+' full');
+    cYear.data.datasets[0].data = allYears.map(y => ACTS.filter(a=>a.date.startsWith(y)&&a.type==='cycling').reduce((s,a)=>s+a.dist,0));
+    cYear.data.datasets[1].data = allYears.map(y => ACTS.filter(a=>a.date.startsWith(y)&&a.type==='running').reduce((s,a)=>s+a.dist,0));
+    cYear.data.datasets[2].data = allYears.map(y => ACTS.filter(a=>a.date.startsWith(y)&&a.type==='workout').reduce((s,a)=>s+a.dist,0));
+    cYear.update();
+  }
+}
+
+// ═══════════════════════════════════════════
 // SYNC INFO
 // ═══════════════════════════════════════════
 function syncInfo() {
@@ -704,7 +814,7 @@ function syncInfo() {
 // ═══════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => { initCharts(); render(); });
+document.addEventListener('DOMContentLoaded', () => { initCharts(); render(); renderYearStats(); });
 </script>
 </body>
 </html>
