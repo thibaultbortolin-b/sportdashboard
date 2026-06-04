@@ -444,6 +444,16 @@ body::after {
         <div class="rec-m-bl" id="rec-rhr-bl">baseline — bpm</div>
         <div class="rec-m-badge" id="rec-rhr-badge"></div>
       </div>
+      <div class="rec-m">
+        <div class="rec-m-title">Slaapkwaliteit</div>
+        <div class="rec-m-row">
+          <div class="rec-m-dot" id="rec-sl-dot" style="background:var(--muted)"></div>
+          <span class="rec-m-val" id="rec-sl-val">—</span>
+          <span class="rec-m-unit">/ 100</span>
+        </div>
+        <div class="rec-m-bl" id="rec-sl-sub">duur · diep · rem · int.</div>
+        <div class="rec-m-badge" id="rec-sl-badge"></div>
+      </div>
     </div>
     <div class="rec-polar-source">Polar · <span id="rec-polar-date">—</span></div>
   </div>
@@ -1307,35 +1317,39 @@ function renderTrainingLoad() {
 // ═══════════════════════════════════════════
 const POLAR = {
   synced: '2026-06-04',
-  baseline: { hrv: 78.8, ans: 0.69, rhr: 56.5 },
+  // 28-day baselines (27 days with data, avg computed at sync)
+  baseline: { hrv: 78.8, ans: 0.69, rhr: 56.5, intDur: 2520 },
   days: [
-    {d:'2026-06-04',hrv:85, ans:6.4,  rhr:54,st:4,dur:27180,ss:64,deep:4890, light:14250,rem:4890},
-    {d:'2026-06-03',hrv:71, ans:-4.4, rhr:57,st:4,dur:32850,ss:87,deep:7020, light:14700,rem:8280},
-    {d:'2026-06-02',hrv:76, ans:-2.6, rhr:56,st:3,dur:27390,ss:68,deep:4380, light:13920,rem:6090},
-    {d:'2026-06-01',hrv:88, ans:5.4,  rhr:53,st:6,dur:30810,ss:81,deep:5160, light:16110,rem:7020},
-    {d:'2026-05-31',hrv:80, ans:-0.8, rhr:56,st:5,dur:30300,ss:82,deep:6720, light:17220,rem:4680},
-    {d:'2026-05-30',hrv:65, ans:-9.5, rhr:61,st:2,dur:31170,ss:74,deep:6150, light:15570,rem:6540},
-    {d:'2026-05-29',hrv:79, ans:2.2,  rhr:54,st:5,dur:27930,ss:75,deep:4650, light:16080,rem:4980},
-    {d:'2026-05-28',hrv:69, ans:-8.9, rhr:61,st:2,dur:29220,ss:83,deep:4440, light:16470,rem:6300},
-    {d:'2026-05-27',hrv:54, ans:-10,  rhr:68,st:1,dur:17970,ss:51,deep:3750, light:8580, rem:3660},
-    {d:'2026-05-26',hrv:96, ans:9.6,  rhr:53,st:6,dur:29520,ss:80,deep:4080, light:16020,rem:7170},
-    {d:'2026-05-25',hrv:88, ans:3.3,  rhr:55,st:5,dur:26370,ss:69,deep:6510, light:12060,rem:5610},
-    {d:'2026-05-24',hrv:74, ans:-1.8, rhr:56,st:5,dur:26250,ss:74,deep:5580, light:12570,rem:6090},
-    {d:'2026-05-23',hrv:86, ans:5.6,  rhr:55,st:4,dur:21510,ss:65,deep:4890, light:10140,rem:5130},
-    {d:'2026-05-22',hrv:85, ans:3.8,  rhr:55,st:5,dur:29670,ss:72,deep:7440, light:12600,rem:6840},
-    {d:'2026-05-20',hrv:84, ans:5.2,  rhr:55,st:5,dur:29040,ss:77,deep:5820, light:14340,rem:6330},
-    {d:'2026-05-19',hrv:82, ans:-0.4, rhr:58,st:3,dur:28800,ss:63,deep:6510, light:14790,rem:4290},
-    {d:'2026-05-18',hrv:91, ans:10,   rhr:53,st:4,dur:29850,ss:62,deep:4290, light:13830,rem:7830},
-    {d:'2026-05-17',hrv:70, ans:-6.4, rhr:58,st:2,dur:38250,ss:72,deep:8790, light:18510,rem:7920},
-    {d:'2026-05-16',hrv:85, ans:3,    rhr:56,st:4,dur:23250,ss:61,deep:5130, light:11610,rem:4500},
-    {d:'2026-05-15',hrv:80, ans:5.7,  rhr:55,st:3,dur:28560,ss:59,deep:5640, light:14850,rem:4440},
-    {d:'2026-05-14',hrv:81, ans:6.9,  rhr:54,st:5,dur:26370,ss:68,deep:4110, light:11490,rem:8310},
-    {d:'2026-05-13',hrv:92, ans:9.3,  rhr:54,st:5,dur:35910,ss:68,deep:6900, light:16680,rem:8730},
-    {d:'2026-05-12',hrv:72, ans:-2.6, rhr:57,st:4,dur:36780,ss:73,deep:5730, light:18780,rem:8940},
-    {d:'2026-05-11',hrv:82, ans:1.8,  rhr:56,st:5,dur:26040,ss:75,deep:7020, light:10350,rem:7260},
-    {d:'2026-05-10',hrv:70, ans:-10,  rhr:63,st:2,dur:31530,ss:73,deep:7380, light:14700,rem:6750},
-    {d:'2026-05-09',hrv:71, ans:0.2,  rhr:56,st:4,dur:24630,ss:68,deep:4470, light:12990,rem:5070},
-    {d:'2026-05-08',hrv:72, ans:-2.3, rhr:57,st:3,dur:25590,ss:69,deep:6090, light:11160,rem:6210},
+    // d=date, hrv=ms RMSSD, ans=ANS charge, rhr=bpm, st=nightly status(1-6),
+    // dur=sleep total(s), ss=sleep score, deep/light/rem=sleep phases(s),
+    // sc=sleep_charge Polar(1-5), intDur=total interruption duration(s)
+    {d:'2026-06-04',hrv:85, ans:6.4,  rhr:54,st:4,dur:27180,ss:64,deep:4890, light:14250,rem:4890, sc:2,intDur:3150},
+    {d:'2026-06-03',hrv:71, ans:-4.4, rhr:57,st:4,dur:32850,ss:87,deep:7020, light:14700,rem:8280, sc:5,intDur:1920},
+    {d:'2026-06-02',hrv:76, ans:-2.6, rhr:56,st:3,dur:27390,ss:68,deep:4380, light:13920,rem:6090, sc:3,intDur:3000},
+    {d:'2026-06-01',hrv:88, ans:5.4,  rhr:53,st:6,dur:30810,ss:81,deep:5160, light:16110,rem:7020, sc:5,intDur:2520},
+    {d:'2026-05-31',hrv:80, ans:-0.8, rhr:56,st:5,dur:30300,ss:82,deep:6720, light:17220,rem:4680, sc:5,intDur:1680},
+    {d:'2026-05-30',hrv:65, ans:-9.5, rhr:61,st:2,dur:31170,ss:74,deep:6150, light:15570,rem:6540, sc:4,intDur:2910},
+    {d:'2026-05-29',hrv:79, ans:2.2,  rhr:54,st:5,dur:27930,ss:75,deep:4650, light:16080,rem:4980, sc:4,intDur:2220},
+    {d:'2026-05-28',hrv:69, ans:-8.9, rhr:61,st:2,dur:29220,ss:83,deep:4440, light:16470,rem:6300, sc:5,intDur:2010},
+    {d:'2026-05-27',hrv:54, ans:-10,  rhr:68,st:1,dur:17970,ss:51,deep:3750, light:8580, rem:3660, sc:1,intDur:1980},
+    {d:'2026-05-26',hrv:96, ans:9.6,  rhr:53,st:6,dur:29520,ss:80,deep:4080, light:16020,rem:7170, sc:5,intDur:2250},
+    {d:'2026-05-25',hrv:88, ans:3.3,  rhr:55,st:5,dur:26370,ss:69,deep:6510, light:12060,rem:5610, sc:3,intDur:2190},
+    {d:'2026-05-24',hrv:74, ans:-1.8, rhr:56,st:5,dur:26250,ss:74,deep:5580, light:12570,rem:6090, sc:4,intDur:2010},
+    {d:'2026-05-23',hrv:86, ans:5.6,  rhr:55,st:4,dur:21510,ss:65,deep:4890, light:10140,rem:5130, sc:2,intDur:1350},
+    {d:'2026-05-22',hrv:85, ans:3.8,  rhr:55,st:5,dur:29670,ss:72,deep:7440, light:12600,rem:6840, sc:3,intDur:2790},
+    {d:'2026-05-20',hrv:84, ans:5.2,  rhr:55,st:5,dur:29040,ss:77,deep:5820, light:14340,rem:6330, sc:4,intDur:2550},
+    {d:'2026-05-19',hrv:82, ans:-0.4, rhr:58,st:3,dur:28800,ss:63,deep:6510, light:14790,rem:4290, sc:2,intDur:3210},
+    {d:'2026-05-18',hrv:91, ans:10,   rhr:53,st:4,dur:29850,ss:62,deep:4290, light:13830,rem:7830, sc:2,intDur:3900},
+    {d:'2026-05-17',hrv:70, ans:-6.4, rhr:58,st:2,dur:38250,ss:72,deep:8790, light:18510,rem:7920, sc:3,intDur:3030},
+    {d:'2026-05-16',hrv:85, ans:3,    rhr:56,st:4,dur:23250,ss:61,deep:5130, light:11610,rem:4500, sc:2,intDur:2010},
+    {d:'2026-05-15',hrv:80, ans:5.7,  rhr:55,st:3,dur:28560,ss:59,deep:5640, light:14850,rem:4440, sc:1,intDur:3630},
+    {d:'2026-05-14',hrv:81, ans:6.9,  rhr:54,st:5,dur:26370,ss:68,deep:4110, light:11490,rem:8310, sc:3,intDur:2460},
+    {d:'2026-05-13',hrv:92, ans:9.3,  rhr:54,st:5,dur:35910,ss:68,deep:6900, light:16680,rem:8730, sc:3,intDur:3600},
+    {d:'2026-05-12',hrv:72, ans:-2.6, rhr:57,st:4,dur:36780,ss:73,deep:5730, light:18780,rem:8940, sc:4,intDur:3330},
+    {d:'2026-05-11',hrv:82, ans:1.8,  rhr:56,st:5,dur:26040,ss:75,deep:7020, light:10350,rem:7260, sc:4,intDur:1410},
+    {d:'2026-05-10',hrv:70, ans:-10,  rhr:63,st:2,dur:31530,ss:73,deep:7380, light:14700,rem:6750, sc:4,intDur:2700},
+    {d:'2026-05-09',hrv:71, ans:0.2,  rhr:56,st:4,dur:24630,ss:68,deep:4470, light:12990,rem:5070, sc:3,intDur:2100},
+    {d:'2026-05-08',hrv:72, ans:-2.3, rhr:57,st:3,dur:25590,ss:69,deep:6090, light:11160,rem:6210, sc:3,intDur:2130},
   ]
 };
 
@@ -1354,11 +1368,43 @@ function recRhrColor(rhr, bl) {
   if (d <= 0) return '#22c55e';
   return d < 5 ? '#f97316' : '#ef4444';
 }
-function recScore(hrv, ans, rhr, bl) {
-  const h = hrv >= bl.hrv ? 100 : ((bl.hrv-hrv)/bl.hrv <= 0.15 ? 50 : 0);
-  const a = ans > 0 ? 100 : (ans >= -5 ? 50 : 0);
-  const r = rhr <= bl.rhr ? 100 : (rhr - bl.rhr < 5 ? 50 : 0);
-  return Math.round(h*0.4 + a*0.4 + r*0.2);
+function recSleepColor(s) {
+  return s >= 75 ? '#22c55e' : s >= 45 ? '#f97316' : '#ef4444';
+}
+
+// ── sleep sub-score (0-100) ──
+// Components: slaapduur 25% · diepe slaap 25% · REM 25% · onderbrekingen 25%
+function sleepSubScore(day, intDurBl) {
+  const total = day.deep + day.light + day.rem;
+  if (total === 0 || !day.dur) return null;
+
+  // 1. Slaapduur (doel 7-9h)
+  const h = day.dur / 3600;
+  const durS = (h >= 7 && h <= 9) ? 100 : ((h >= 6 && h < 7) || (h > 9 && h <= 10)) ? 60 : 20;
+
+  // 2. Diepe slaap ≥18% van totale slaaptijd
+  const deepPct = day.deep / total * 100;
+  const deepS = deepPct >= 18 ? 100 : deepPct >= 12 ? 60 : 20;
+
+  // 3. REM ≥18% van totale slaaptijd
+  const remPct = day.rem / total * 100;
+  const remS = remPct >= 18 ? 100 : remPct >= 12 ? 60 : 20;
+
+  // 4. Onderbrekingen (lager dan baseline = beter)
+  const intRatio = intDurBl > 0 ? day.intDur / intDurBl : 1;
+  const intS = intRatio <= 1.0 ? 100 : intRatio <= 1.3 ? 60 : 20;
+
+  return Math.round(durS*0.25 + deepS*0.25 + remS*0.25 + intS*0.25);
+}
+
+// ── overall recovery score (0-100) ──
+// HRV 25% · ANS 25% · RHR 15% · Sleep 35%
+function recScore(day, bl) {
+  const h = day.hrv >= bl.hrv ? 100 : ((bl.hrv-day.hrv)/bl.hrv <= 0.15 ? 50 : 0);
+  const a = day.ans > 0 ? 100 : (day.ans >= -5 ? 50 : 0);
+  const r = day.rhr <= bl.rhr ? 100 : (day.rhr - bl.rhr < 5 ? 50 : 0);
+  const sl = sleepSubScore(day, bl.intDur) ?? 50;
+  return Math.round(h*0.25 + a*0.25 + r*0.15 + sl*0.35);
 }
 function colorBadge(label, color) {
   const bg = color+'22';
@@ -1380,12 +1426,14 @@ function polarDateFmt(d) {
 function renderRecoveryWidget() {
   if (!POLAR.days.length) return;
   const today = POLAR.days[0];
-  const bl = POLAR.baseline;
+  const bl    = POLAR.baseline;
 
-  const hc = recHrvColor(today.hrv, bl.hrv);
-  const ac = recAnsColor(today.ans);
-  const rc = recRhrColor(today.rhr, bl.rhr);
-  const score = recScore(today.hrv, today.ans, today.rhr, bl);
+  const hc    = recHrvColor(today.hrv, bl.hrv);
+  const ac    = recAnsColor(today.ans);
+  const rc    = recRhrColor(today.rhr, bl.rhr);
+  const slS   = sleepSubScore(today, bl.intDur) ?? 50;
+  const slC   = recSleepColor(slS);
+  const score = recScore(today, bl);
   const scLbl  = score >= 75 ? 'Goed' : score >= 45 ? 'Matig' : 'Laag';
   const scCol  = score >= 75 ? '#22c55e' : score >= 45 ? '#f97316' : '#ef4444';
   const scIcon = score >= 75 ? '✅' : score >= 45 ? '⚠️' : '🔴';
@@ -1399,27 +1447,38 @@ function renderRecoveryWidget() {
 
   // HRV
   const hrvDiff = today.hrv - bl.hrv;
-  document.getElementById('rec-hrv-val').textContent   = today.hrv;
-  document.getElementById('rec-hrv-val').style.color   = hc;
-  document.getElementById('rec-hrv-dot').style.background = hc;
-  document.getElementById('rec-hrv-bl').textContent    = `baseline ${Math.round(bl.hrv)} ms`;
-  document.getElementById('rec-hrv-badge').innerHTML   = colorBadge((hrvDiff>=0?'↑ +':'↓ ')+Math.abs(Math.round(hrvDiff))+' ms', hc);
+  document.getElementById('rec-hrv-val').textContent       = today.hrv;
+  document.getElementById('rec-hrv-val').style.color       = hc;
+  document.getElementById('rec-hrv-dot').style.background  = hc;
+  document.getElementById('rec-hrv-bl').textContent        = `baseline ${Math.round(bl.hrv)} ms`;
+  document.getElementById('rec-hrv-badge').innerHTML       = colorBadge((hrvDiff>=0?'↑ +':'↓ ')+Math.abs(Math.round(hrvDiff))+' ms', hc);
 
   // ANS
   const ansDiff = today.ans - bl.ans;
-  document.getElementById('rec-ans-val').textContent   = (today.ans>0?'+':'')+today.ans;
-  document.getElementById('rec-ans-val').style.color   = ac;
-  document.getElementById('rec-ans-dot').style.background = ac;
-  document.getElementById('rec-ans-bl').textContent    = `baseline ${bl.ans>=0?'+':''}${bl.ans.toFixed(1)}`;
-  document.getElementById('rec-ans-badge').innerHTML   = colorBadge((ansDiff>=0?'↑ +':'↓ ')+Math.abs(ansDiff.toFixed(1)), ac);
+  document.getElementById('rec-ans-val').textContent       = (today.ans>0?'+':'')+today.ans;
+  document.getElementById('rec-ans-val').style.color       = ac;
+  document.getElementById('rec-ans-dot').style.background  = ac;
+  document.getElementById('rec-ans-bl').textContent        = `baseline ${bl.ans>=0?'+':''}${bl.ans.toFixed(1)}`;
+  document.getElementById('rec-ans-badge').innerHTML       = colorBadge((ansDiff>=0?'↑ +':'↓ ')+Math.abs(ansDiff.toFixed(1)), ac);
 
   // RHR
   const rhrDiff = today.rhr - bl.rhr;
-  document.getElementById('rec-rhr-val').textContent   = today.rhr;
-  document.getElementById('rec-rhr-val').style.color   = rc;
-  document.getElementById('rec-rhr-dot').style.background = rc;
-  document.getElementById('rec-rhr-bl').textContent    = `baseline ${Math.round(bl.rhr)} bpm`;
-  document.getElementById('rec-rhr-badge').innerHTML   = colorBadge((rhrDiff<=0?'↓ ':'+')+(rhrDiff<=0?Math.abs(Math.round(rhrDiff)):Math.round(rhrDiff))+' bpm', rc);
+  document.getElementById('rec-rhr-val').textContent       = today.rhr;
+  document.getElementById('rec-rhr-val').style.color       = rc;
+  document.getElementById('rec-rhr-dot').style.background  = rc;
+  document.getElementById('rec-rhr-bl').textContent        = `baseline ${Math.round(bl.rhr)} bpm`;
+  document.getElementById('rec-rhr-badge').innerHTML       = colorBadge((rhrDiff<=0?'↓ ':'+')+(rhrDiff<=0?Math.abs(Math.round(rhrDiff)):Math.round(rhrDiff))+' bpm', rc);
+
+  // Sleep sub-score
+  const total   = today.deep + today.light + today.rem;
+  const deepPct = total > 0 ? Math.round(today.deep / total * 100) : 0;
+  const remPct  = total > 0 ? Math.round(today.rem  / total * 100) : 0;
+  const intMin  = Math.round(today.intDur / 60);
+  document.getElementById('rec-sl-val').textContent       = slS;
+  document.getElementById('rec-sl-val').style.color       = slC;
+  document.getElementById('rec-sl-dot').style.background  = slC;
+  document.getElementById('rec-sl-sub').textContent       = `${fmtDur(today.dur)} · diep ${deepPct}% · rem ${remPct}% · int. ${intMin}m`;
+  document.getElementById('rec-sl-badge').innerHTML       = colorBadge('Polar sleep charge ' + today.sc + '/5', slC);
 }
 
 // ── HEALTH TAB ──
@@ -1455,8 +1514,9 @@ function renderHealthTab() {
       ['ANS-lading',`<span style="color:${ac};font-weight:700">${day.ans>0?'+':''}${day.ans}</span>`, ref ? deltaHtml(day.ans, ref.ans, '', false) : ''],
       ['Rusthartslag',`<span style="color:${rc};font-weight:700">${day.rhr} bpm</span>`, ref ? deltaHtml(day.rhr, ref.rhr, 'bpm', true) : ''],
       ['Nightly Recharge', stText(day.st), ''],
-      ['Slaapduur', `${sleepH}u ${sleepM.toString().padStart(2,'0')}m`, ref ? deltaHtml(day.dur/3600, ref.dur/3600, 'u', false) : ''],
-      ['Slaapscore', `<span style="color:${scoreClr};font-weight:700">${day.ss} / 100</span>`, ref ? deltaHtml(day.ss, ref.ss, '', false) : ''],
+      ['Slaapduur',    `${sleepH}u ${sleepM.toString().padStart(2,'0')}m`, ref ? deltaHtml(day.dur/3600, ref.dur/3600, 'u', false) : ''],
+      ['Slaapscore',   `<span style="color:${scoreClr};font-weight:700">${day.ss} / 100</span>`, ref ? deltaHtml(day.ss, ref.ss, '', false) : ''],
+      ['Onderbrekingen', `${Math.round(day.intDur/60)} min`, ref ? deltaHtml(day.intDur/60, ref.intDur/60, 'min', true) : ''],
     ];
     return rows.map(([k,v,d]) => `<div class="ht-row"><span class="ht-key">${k}</span><span class="ht-val">${v}${d}</span></div>`).join('');
   }
@@ -1488,6 +1548,7 @@ function renderHealthTab() {
       <div class="sleep-leg-item"><div class="sleep-leg-dot" style="background:#38bdf8"></div>Diepe slaap ${fmtDur(today.deep)} (${deepPct.toFixed(0)}%)</div>
       <div class="sleep-leg-item"><div class="sleep-leg-dot" style="background:#a855f7"></div>REM ${fmtDur(today.rem)} (${remPct.toFixed(0)}%)</div>
       <div class="sleep-leg-item"><div class="sleep-leg-dot" style="background:#475569"></div>Lichte slaap ${fmtDur(today.light)} (${lightPct.toFixed(0)}%)</div>
+      <div class="sleep-leg-item"><div class="sleep-leg-dot" style="background:#ef4444"></div>Onderbrekingen ${fmtDur(today.intDur)}</div>
     </div>`;
 
   // ── Charts ──
