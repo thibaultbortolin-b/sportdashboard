@@ -6,7 +6,9 @@
       "Bash(git commit *)",
       "Bash(git push *)",
       "mcp__74825fea-fd68-470a-b2d7-bfc01db38b9a__context_get_activity_streams",
-      "Bash(python3 - /Users/thibaultbortolin/.claude/projects/-Users-thibaultbortolin-Claude-Code/043e7cbd-8cb7-42ba-85f0-f1fc9ef166aa/tool-results/mcp-74825fea-fd68-470a-b2d7-bfc01db38b9a-context_get_activity_streams-1780566527464.txt r1)"
+      "Bash(python3 - /Users/thibaultbortolin/.claude/projects/-Users-thibaultbortolin-Claude-Code/043e7cbd-8cb7-42ba-85f0-f1fc9ef166aa/tool-results/mcp-74825fea-fd68-470a-b2d7-bfc01db38b9a-context_get_activity_streams-1780566527464.txt r1)",
+      "mcp__371c496a-f478-4192-8f58-70c3e95ac050__list_metrics",
+      "mcp__371c496a-f478-4192-8f58-70c3e95ac050__query_metrics"
     ]
   }
 }
