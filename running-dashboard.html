@@ -539,16 +539,16 @@ body::after {
 // ═══════════════════════════════════════════
 const SYNC = '2026-06-04';
 const ACTS = [
-  {id:'r1',date:'2025-06-07',name:'Afternoon Run',           type:'running',dist:9.997, time:2704,pace:4.505,hr:null, hrx:null,pwr:null, spd:null, elev:4.4,  dev:'Strava App'},
-  {id:'c1',date:'2025-06-12',name:'Race tegen de zon',       type:'cycling',dist:31.909,time:4434,pace:null, hr:null, hrx:null,pwr:null, spd:25.9, elev:39.0, dev:'Strava App'},
-  {id:'r2',date:'2025-06-22',name:'Morning Run',             type:'running',dist:5.564, time:1765,pace:5.288,hr:164.3,hrx:181, pwr:224.1,spd:null, elev:41.8, dev:'Apple Watch SE'},
-  {id:'c2',date:'2025-06-25',name:'Afternoon Ride',          type:'cycling',dist:36.133,time:5546,pace:null, hr:null, hrx:null,pwr:null, spd:23.5, elev:58.4, dev:'Strava App'},
-  {id:'c3',date:'2025-08-05',name:'Lunch Ride',              type:'cycling',dist:15.114,time:2144,pace:null, hr:null, hrx:null,pwr:null, spd:25.4, elev:20.1, dev:'Strava App'},
-  {id:'w1',date:'2025-10-23',name:'Namiddagtraining',        type:'workout',dist:0,     time:569, pace:null, hr:136.7,hrx:150, pwr:null, spd:null, elev:0,    dev:'Polar'},
-  {id:'c4',date:'2026-03-04',name:'Eindelijk genieten v zon',type:'cycling',dist:45.700,time:6313,pace:null, hr:null, hrx:null,pwr:null, spd:26.1, elev:75.6, dev:'Strava App'},
-  {id:'r5',date:'2026-05-30',name:'Afternoon Run',           type:'running',dist:3.247, time:1258,pace:6.455,hr:143.9,hrx:164, pwr:204.2,spd:null, elev:5.2,  dev:'Apple Watch SE'},
-  {id:'r3',date:'2026-05-31',name:'Pallieterjogging',        type:'running',dist:9.854, time:2728,pace:4.615,hr:179,  hrx:189, pwr:273,  spd:null, elev:11.4, dev:'Apple Watch SE'},
-  {id:'r4',date:'2026-06-03',name:'Evening Run',             type:'running',dist:5.115, time:1703,pace:5.549,hr:154.2,hrx:177, pwr:232.3,spd:null, elev:8.2,  dev:'Apple Watch SE'},
+  {id:'r1',date:'2025-06-07',name:'Afternoon Run',           type:'running',dist:9.997, time:2704,pace:4.505,hr:null, hrx:null,pwr:null, spd:null, elev:4.4,  dev:'Strava App',      km1split:255.6},
+  {id:'c1',date:'2025-06-12',name:'Race tegen de zon',       type:'cycling',dist:31.909,time:4434,pace:null, hr:null, hrx:null,pwr:null, spd:25.9, elev:39.0, dev:'Strava App',      km1split:null},
+  {id:'r2',date:'2025-06-22',name:'Morning Run',             type:'running',dist:5.564, time:1765,pace:5.288,hr:164.3,hrx:181, pwr:224.1,spd:null, elev:41.8, dev:'Apple Watch SE',  km1split:359.7},
+  {id:'c2',date:'2025-06-25',name:'Afternoon Ride',          type:'cycling',dist:36.133,time:5546,pace:null, hr:null, hrx:null,pwr:null, spd:23.5, elev:58.4, dev:'Strava App',      km1split:null},
+  {id:'c3',date:'2025-08-05',name:'Lunch Ride',              type:'cycling',dist:15.114,time:2144,pace:null, hr:null, hrx:null,pwr:null, spd:25.4, elev:20.1, dev:'Strava App',      km1split:null},
+  {id:'w1',date:'2025-10-23',name:'Namiddagtraining',        type:'workout',dist:0,     time:569, pace:null, hr:136.7,hrx:150, pwr:null, spd:null, elev:0,    dev:'Polar',           km1split:null},
+  {id:'c4',date:'2026-03-04',name:'Eindelijk genieten v zon',type:'cycling',dist:45.700,time:6313,pace:null, hr:null, hrx:null,pwr:null, spd:26.1, elev:75.6, dev:'Strava App',      km1split:null},
+  {id:'r5',date:'2026-05-30',name:'Afternoon Run',           type:'running',dist:3.247, time:1258,pace:6.455,hr:143.9,hrx:164, pwr:204.2,spd:null, elev:5.2,  dev:'Apple Watch SE',  km1split:392.7},
+  {id:'r3',date:'2026-05-31',name:'Pallieterjogging',        type:'running',dist:9.854, time:2728,pace:4.615,hr:179,  hrx:189, pwr:273,  spd:null, elev:11.4, dev:'Apple Watch SE',  km1split:258.8},
+  {id:'r4',date:'2026-06-03',name:'Evening Run',             type:'running',dist:5.115, time:1703,pace:5.549,hr:154.2,hrx:177, pwr:232.3,spd:null, elev:8.2,  dev:'Apple Watch SE',  km1split:336.3},
 ];
 
 const ZONES = [
@@ -839,15 +839,14 @@ function switchTab(name, btn) {
 // ═══════════════════════════════════════════
 // PERSONAL BESTS
 // ═══════════════════════════════════════════
-// For each target, include all runs >= minKm, estimate finish time via avg pace × target
+// PB categories — 1km uses stream-derived km1split; 5km/10km use avg pace × target
 const PB_CATS = [
-  { label:'1 km',  targetKm:1,  minKm:0.8 },
-  { label:'5 km',  targetKm:5,  minKm:4.5 },
-  { label:'10 km', targetKm:10, minKm:9.0 },
+  { label:'1 km',  targetKm:1,  minKm:4.5, useStream:true  },
+  { label:'5 km',  targetKm:5,  minKm:4.5, useStream:false },
+  { label:'10 km', targetKm:10, minKm:9.0, useStream:false },
 ];
 
 function fmtFinish(sec) {
-  // Format total seconds as M:SS or H:MM:SS
   const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = Math.round(sec%60);
   if (h > 0) return `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
   return `${m}:${s.toString().padStart(2,'0')}`;
@@ -857,6 +856,42 @@ function renderPersonalBests() {
   const runs = ACTS.filter(a => a.type === 'running' && a.dist > 0 && a.time > 0);
 
   document.getElementById('pbCards').innerHTML = PB_CATS.map(cat => {
+
+    // ── 1 km: use stream-derived first-km split from km1split field ──
+    if (cat.useStream) {
+      // All runs that have a km1split (stream data available)
+      const streamRuns = runs.filter(a => a.km1split != null);
+      // Fallback: short runs 0.8–1.5km without stream data, use avg pace as proxy
+      const fallbackRuns = runs.filter(a => a.km1split == null && a.dist >= 0.8 && a.dist <= 1.5);
+
+      const candidates = [
+        ...streamRuns.map(a => ({ a, splitSec: a.km1split, source: 'stream' })),
+        ...fallbackRuns.map(a => ({ a, splitSec: (a.time / a.dist) * 1, source: 'fallback' })),
+      ];
+
+      if (!candidates.length) {
+        return `<div class="pb-card">
+          <div class="pb-dist">${cat.label}</div>
+          <div class="pb-empty">—</div>
+          <div class="pb-divider"></div>
+          <div class="pb-nodata">no qualifying run yet</div>
+        </div>`;
+      }
+
+      const best = candidates.reduce((a, b) => a.splitSec < b.splitSec ? a : b);
+      const m = Math.floor(best.splitSec / 60), s = Math.round(best.splitSec % 60);
+      const tag = best.source === 'stream' ? 'GPS stream split' : 'avg pace proxy';
+
+      return `<div class="pb-card">
+        <div class="pb-dist">${cat.label}</div>
+        <div class="pb-pace">${m}:${s.toString().padStart(2,'0')}<span class="pb-unit">min</span></div>
+        <div class="pb-divider"></div>
+        <div class="pb-name">${best.a.name}</div>
+        <div class="pb-meta">${dFmt(best.a.date)} · ${best.a.dist.toFixed(2)} km · ${tag}</div>
+      </div>`;
+    }
+
+    // ── 5km / 10km: best avg pace × target distance ──
     const qualifying = runs.filter(a => a.dist >= cat.minKm);
 
     if (!qualifying.length) {
@@ -868,14 +903,11 @@ function renderPersonalBests() {
       </div>`;
     }
 
-    // Find the run with lowest avg pace (= fastest runner)
-    const best = qualifying.reduce((champ, a) => {
-      return (a.time / a.dist) < (champ.time / champ.dist) ? a : champ;
-    });
-
-    const avgPace   = (best.time / 60) / best.dist;          // min/km
-    const estTimeSec = avgPace * 60 * cat.targetKm;           // estimated finish in seconds
-    const label     = cat.targetKm === 1 ? 'min' : 'min';
+    const best = qualifying.reduce((champ, a) =>
+      (a.time / a.dist) < (champ.time / champ.dist) ? a : champ
+    );
+    const avgPace    = (best.time / 60) / best.dist;
+    const estTimeSec = avgPace * 60 * cat.targetKm;
 
     return `<div class="pb-card">
       <div class="pb-dist">${cat.label}</div>
