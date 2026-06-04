@@ -203,6 +203,25 @@ body::after {
 .ins-title { font-size:13px; font-weight:600; margin-bottom:8px; }
 .ins-body { font-size:12px; color:var(--t2); line-height:1.65; }
 
+/* ── TRAINING LOAD ── */
+.tl-info {
+  display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+  background:var(--card); border:1px solid var(--border); border-radius:10px;
+  padding:10px 16px; font-size:12px; color:var(--t2);
+}
+.tl-info b { color:var(--text); }
+.tl-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.tl-card {
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:22px 20px; border-top:3px solid var(--tl-c, var(--border-h));
+  transition:border-color .2s, background .2s;
+}
+.tl-card:hover { background:var(--card-h); }
+.tl-card-label { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:8px; }
+.tl-card-value { font-size:36px; font-weight:700; letter-spacing:-1px; color:var(--tl-c, var(--text)); line-height:1; margin-bottom:6px; }
+.tl-card-sub { font-size:11px; color:var(--muted); margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+.tl-card-desc { font-size:12px; color:var(--t2); line-height:1.55; }
+
 /* scrollbar */
 ::-webkit-scrollbar { width:5px; height:5px; }
 ::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12); border-radius:3px; }
@@ -240,6 +259,7 @@ body::after {
   <button class="tab-btn active" onclick="switchTab('overview',this)">Overview</button>
   <button class="tab-btn" onclick="switchTab('analysis',this)">Analysis</button>
   <button class="tab-btn" onclick="switchTab('year',this)">Year Stats</button>
+  <button class="tab-btn" onclick="switchTab('training',this)">Training Load</button>
 </div>
 
 <!-- ══════════ TAB 1: OVERVIEW ══════════ -->
@@ -367,6 +387,68 @@ body::after {
     <div class="ins-card" style="--ic:var(--z5)"><div class="ins-title" style="color:var(--z5)">⚠️ Intensity imbalance</div><div class="ins-body">All HR-tracked runs are Z3–Z5. No easy Z1/Z2 running logged. Add slow runs below 141 bpm to build aerobic base and improve recovery between hard efforts.</div></div>
     <div class="ins-card" style="--ic:var(--green)"><div class="ins-title" style="color:var(--green)">📈 Positive trends</div><div class="ins-body">Run pace improved 10s/km year-over-year. Power up +22% (224→273W). Longest ride grew from 36 to 46 km. All key performance indicators are moving in the right direction.</div></div>
     <div class="ins-card" style="--ic:var(--bike)"><div class="ins-title" style="color:var(--bike)">💡 Add HR to cycling</div><div class="ins-body">0 of 4 rides have HR data — all logged via Strava App only. Wear your Apple Watch or Polar on rides to unlock zone analysis and full training load insight.</div></div>
+  </div>
+
+</div>
+
+<!-- ══════════ TAB 4: TRAINING LOAD ══════════ -->
+<div id="tab-training" class="tab-panel">
+
+  <!-- info strip -->
+  <div class="tl-info mb">
+    <span>HR threshold <b id="tl-threshold">177 bpm</b></span>
+    <span>HR max <b>198 bpm</b></span>
+    <span>CTL window <b>28 days</b></span>
+    <span>ATL window <b>7 days</b></span>
+    <span style="margin-left:auto;color:var(--muted);font-size:11px">hrTSS = (duration × avgHR × avgHR/threshold) / (threshold × 3600) × 100</span>
+  </div>
+
+  <!-- 3 metric cards -->
+  <div class="tl-cards mb">
+    <div class="tl-card" id="tl-card-ctl">
+      <div class="tl-card-label">CTL — Fitness</div>
+      <div class="tl-card-value" id="tl-ctl">—</div>
+      <div class="tl-card-sub">Chronic Training Load · 28-day avg</div>
+      <div class="tl-card-desc">Long-term aerobic fitness base. Build slowly; high CTL = strong base.</div>
+    </div>
+    <div class="tl-card" id="tl-card-atl">
+      <div class="tl-card-label">ATL — Fatigue</div>
+      <div class="tl-card-value" id="tl-atl">—</div>
+      <div class="tl-card-sub">Acute Training Load · 7-day avg</div>
+      <div class="tl-card-desc">Short-term fatigue from recent training. Spikes after hard blocks.</div>
+    </div>
+    <div class="tl-card" id="tl-card-tsb">
+      <div class="tl-card-label">TSB — Form</div>
+      <div class="tl-card-value" id="tl-tsb">—</div>
+      <div class="tl-card-sub">Training Stress Balance · CTL − ATL</div>
+      <div class="tl-card-desc" id="tl-tsb-desc">Positive = fresh &amp; ready to race. Negative = fatigued, still adapting.</div>
+    </div>
+  </div>
+
+  <!-- chart -->
+  <div class="card mb">
+    <div class="card-hd">
+      <div>
+        <div class="card-title">CTL / ATL / TSB — Last 28 Days</div>
+        <div class="card-sub">Based on hrTSS from heart-rate activities</div>
+      </div>
+      <div style="display:flex;gap:16px;font-size:12px;align-items:center">
+        <span><span style="display:inline-block;width:20px;height:2px;background:#38bdf8;vertical-align:middle;margin-right:5px"></span>CTL (fitness)</span>
+        <span><span style="display:inline-block;width:20px;height:2px;background:#f97316;border-top:2px dashed #f97316;vertical-align:middle;margin-right:5px"></span>ATL (fatigue)</span>
+        <span><span style="display:inline-block;width:20px;height:2px;background:#22c55e;border-top:2px dashed #22c55e;vertical-align:middle;margin-right:5px"></span>TSB (form)</span>
+      </div>
+    </div>
+    <div style="height:260px;position:relative"><canvas id="tlChart"></canvas></div>
+  </div>
+
+  <!-- activity list -->
+  <div class="card">
+    <div class="card-hd"><div class="card-title">HR Activities — hrTSS breakdown</div><div class="card-sub">Only activities with heart rate data are included in the calculation</div></div>
+    <table class="ctbl" id="tlActTable">
+      <thead><tr><th>Date</th><th>Activity</th><th>Duration</th><th>Avg HR</th><th>Max HR</th><th>Zone</th><th style="text-align:right">hrTSS</th></tr></thead>
+      <tbody id="tlActBody"></tbody>
+    </table>
+    <div id="tlNoHr" style="display:none;text-align:center;padding:20px;font-size:13px;color:var(--muted)">No activities with HR data found in the selected period.</div>
   </div>
 
 </div>
@@ -674,7 +756,151 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
-  setTimeout(()=>[cVol,cDonut,cPace,cPower,cSpeed,cBikeDist,cYear].forEach(c=>c&&c.resize()), 50);
+  setTimeout(()=>[cVol,cDonut,cPace,cPower,cSpeed,cBikeDist,cYear,cTL].forEach(c=>c&&c.resize()), 50);
+}
+
+// ═══════════════════════════════════════════
+// TRAINING LOAD — CTL / ATL / TSB
+// ═══════════════════════════════════════════
+const HR_THRESHOLD = 177;   // lactate threshold HR (bpm) — edit here
+const HR_MAX       = 198;   // max HR (bpm) — edit here
+const K_CTL = Math.exp(-1/28);  // 28-day decay ≈ 0.9645
+const K_ATL = Math.exp(-1/7);   // 7-day decay  ≈ 0.8669
+
+function hrTSS(a) {
+  if (!a.hr || !a.time) return 0;
+  return (a.time * a.hr * (a.hr / HR_THRESHOLD)) / (HR_THRESHOLD * 3600) * 100;
+}
+
+function buildLoadHistory() {
+  // Map date → total TSS
+  const tssMap = {};
+  ACTS.forEach(a => {
+    if (a.hr) {
+      const t = hrTSS(a);
+      tssMap[a.date] = (tssMap[a.date] || 0) + t;
+    }
+  });
+
+  if (!Object.keys(tssMap).length) return { today: {ctl:0,atl:0,tsb:0}, last28:[], hrActs:[] };
+
+  // Iterate from earliest HR activity → SYNC date
+  const start = new Date(Object.keys(tssMap).sort()[0]);
+  const end   = new Date(SYNC);
+  const history = [];
+  let ctl = 0, atl = 0;
+  const cur = new Date(start);
+
+  while (cur <= end) {
+    const ds = cur.toISOString().slice(0,10);
+    const tss = tssMap[ds] || 0;
+    ctl = ctl * K_CTL + tss * (1 - K_CTL);
+    atl = atl * K_ATL + tss * (1 - K_ATL);
+    history.push({ date: ds, tss, ctl: +ctl.toFixed(1), atl: +atl.toFixed(1), tsb: +(ctl-atl).toFixed(1) });
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  const last28  = history.slice(-28);
+  const todayPt = history[history.length - 1] || { ctl:0, atl:0, tsb:0 };
+  const hrActs  = ACTS.filter(a => a.hr)
+                      .map(a => ({ ...a, tss: hrTSS(a) }))
+                      .sort((a,b) => new Date(b.date) - new Date(a.date));
+  return { today: todayPt, last28, hrActs };
+}
+
+let cTL = null;
+
+function renderTrainingLoad() {
+  const { today, last28, hrActs } = buildLoadHistory();
+  const { ctl, atl, tsb } = today;
+
+  // Update threshold display
+  document.getElementById('tl-threshold').textContent = HR_THRESHOLD + ' bpm';
+
+  // Metric cards
+  const ctlEl = document.getElementById('tl-ctl');
+  const atlEl = document.getElementById('tl-atl');
+  const tsbEl = document.getElementById('tl-tsb');
+  ctlEl.textContent = ctl.toFixed(1);
+  atlEl.textContent = atl.toFixed(1);
+  tsbEl.textContent = (tsb >= 0 ? '+' : '') + tsb.toFixed(1);
+
+  // Card accent colours
+  document.getElementById('tl-card-ctl').style.setProperty('--tl-c','#38bdf8');
+  document.getElementById('tl-card-atl').style.setProperty('--tl-c','#f97316');
+  const tsbColor = tsb >= 0 ? '#22c55e' : '#ef4444';
+  document.getElementById('tl-card-tsb').style.setProperty('--tl-c', tsbColor);
+  document.getElementById('tl-tsb-desc').textContent = tsb >= 5
+    ? '✅ Fresh & ready — good time to race or hit a hard effort.'
+    : tsb >= -10
+    ? '⚠️ Slightly fatigued — still adapting. Easy days recommended.'
+    : '🔴 High fatigue — prioritise recovery before intensity.';
+
+  // Chart
+  const labels = last28.map(d => {
+    const dt = new Date(d.date);
+    return dt.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+  });
+  if (!cTL) {
+    cTL = new Chart(document.getElementById('tlChart'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label:'CTL (Fitness)',  data: last28.map(d=>d.ctl), borderColor:'#38bdf8', backgroundColor:'rgba(56,189,248,.08)',  borderWidth:2.5, tension:.35, fill:true,  pointRadius:2, pointHoverRadius:5 },
+          { label:'ATL (Fatigue)',  data: last28.map(d=>d.atl), borderColor:'#f97316', backgroundColor:'transparent', borderWidth:2,   tension:.35, fill:false, pointRadius:2, pointHoverRadius:5, borderDash:[5,3] },
+          { label:'TSB (Form)',     data: last28.map(d=>d.tsb), borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,.06)', borderWidth:2,   tension:.35, fill:true,  pointRadius:2, pointHoverRadius:5, borderDash:[4,3] },
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode:'index', intersect:false },
+        plugins: {
+          legend: { display:false },
+          tooltip: {
+            backgroundColor:'rgba(15,18,32,.95)', borderColor:'rgba(255,255,255,.1)', borderWidth:1,
+            callbacks: { label: c => ` ${c.dataset.label}: ${c.raw}` }
+          }
+        },
+        scales: {
+          x: { grid:{ color:DG }, ticks:{ maxRotation:35, font:{size:10} } },
+          y: { grid:{ color:DG }, ticks:{ callback: v => v.toFixed(0) } }
+        }
+      }
+    });
+  } else {
+    cTL.data.labels = labels;
+    cTL.data.datasets[0].data = last28.map(d=>d.ctl);
+    cTL.data.datasets[1].data = last28.map(d=>d.atl);
+    cTL.data.datasets[2].data = last28.map(d=>d.tsb);
+    cTL.update();
+  }
+
+  // Activity table
+  const tbody = document.getElementById('tlActBody');
+  if (!hrActs.length) {
+    tbody.innerHTML = '';
+    document.getElementById('tlNoHr').style.display = 'block';
+    document.getElementById('tlActTable').style.display = 'none';
+    return;
+  }
+  document.getElementById('tlNoHr').style.display = 'none';
+  document.getElementById('tlActTable').style.display = '';
+
+  tbody.innerHTML = hrActs.map(a => {
+    const z = zone(a.hr);
+    const tssVal = a.tss.toFixed(1);
+    const tssColor = a.tss >= 80 ? '#ef4444' : a.tss >= 50 ? '#f97316' : a.tss >= 25 ? '#eab308' : '#22c55e';
+    return `<tr>
+      <td style="color:var(--muted)">${dFmt(a.date)}</td>
+      <td style="font-weight:600">${a.name}</td>
+      <td>${t2s(a.time)}</td>
+      <td style="color:${z.c};font-weight:600">${Math.round(a.hr)} bpm</td>
+      <td style="color:var(--t2)">${a.hrx ? a.hrx+' bpm' : '—'}</td>
+      <td><span style="font-size:11px;padding:2px 7px;border-radius:20px;background:${z.c}18;color:${z.c};font-weight:600">${z.n}</span></td>
+      <td style="text-align:right;font-weight:700;font-size:14px;color:${tssColor}">${tssVal}</td>
+    </tr>`;
+  }).join('');
 }
 
 // ═══════════════════════════════════════════
@@ -814,7 +1040,7 @@ function syncInfo() {
 // ═══════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => { initCharts(); render(); renderYearStats(); });
+document.addEventListener('DOMContentLoaded', () => { initCharts(); render(); renderYearStats(); renderTrainingLoad(); });
 </script>
 </body>
 </html>
