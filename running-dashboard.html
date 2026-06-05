@@ -316,6 +316,24 @@ body::after {
   display:flex; align-items:flex-end; flex-shrink:0; justify-content:flex-end;
 }
 
+/* ── POLAR SYNC BAR ── */
+.rec-sync-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 14px; border-top:1px solid var(--border);
+  background:rgba(255,255,255,.01); font-size:11px; color:var(--muted);
+  flex-shrink:0; min-width:0;
+}
+.rec-sync-bar span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.btn-polar {
+  display:inline-flex; align-items:center; gap:5px;
+  background:rgba(56,189,248,.08); border:1px solid rgba(56,189,248,.25);
+  color:var(--bike); padding:4px 11px; border-radius:7px;
+  font-size:11px; font-weight:600; cursor:pointer; flex-shrink:0;
+  transition:background .2s, border-color .2s;
+}
+.btn-polar:hover { background:rgba(56,189,248,.18); border-color:rgba(56,189,248,.5); }
+.btn-polar:disabled { opacity:.5; cursor:default; }
+
 /* ── HEALTH & RECOVERY TAB ── */
 .ht-compare { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px; }
 .ht-day-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; }
@@ -407,7 +425,8 @@ body::after {
   </div>
 
   <!-- ── POLAR RECOVERY WIDGET ── -->
-  <div class="rec-widget">
+  <div class="rec-widget" style="flex-direction:column">
+  <div style="display:flex;align-items:stretch;flex:1">
     <div class="rec-overall">
       <div class="rec-overall-title">Herstel</div>
       <div class="rec-score-num" id="rec-score-num">—</div>
@@ -455,7 +474,11 @@ body::after {
         <div class="rec-m-badge" id="rec-sl-badge"></div>
       </div>
     </div>
-    <div class="rec-polar-source">Polar · <span id="rec-polar-date">—</span></div>
+  </div><!-- /inner flex row -->
+  <div class="rec-sync-bar">
+    <span id="rec-sync-label">🔵 Polar · gesynchroniseerd op —</span>
+    <button class="btn-polar" id="btn-polar-refresh" onclick="polarRefresh(this)">🔄 Vernieuwen</button>
+  </div>
   </div>
   <!-- ── END RECOVERY WIDGET ── -->
 
@@ -646,6 +669,12 @@ body::after {
 
 <!-- ══════════ TAB 5: GEZONDHEID & HERSTEL ══════════ -->
 <div id="tab-health" class="tab-panel">
+
+  <!-- Health tab sync bar -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <div style="font-size:12px;color:var(--muted)">🔵 Polar · <span id="health-sync-label">gesynchroniseerd op —</span></div>
+    <button class="btn-polar" onclick="polarRefresh(this)">🔄 Vernieuwen</button>
+  </div>
 
   <!-- Section 1: Vandaag vs Gisteren -->
   <div class="stitle">Herstel — Vandaag vs Gisteren</div>
@@ -1009,7 +1038,7 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'health') renderHealthTab();
+  if (name === 'health') { renderHealthTab(); updateSyncLabels(); }
   setTimeout(()=>[cVol,cDonut,cPace,cPower,cSpeed,cBikeDist,cYear,cTL,cHrvAns,cRhr,cSleepTrend].forEach(c=>c&&c.resize()), 50);
 }
 
@@ -1316,7 +1345,7 @@ function renderTrainingLoad() {
 // POLAR DATA  (synced 2026-06-04, days newest→oldest)
 // ═══════════════════════════════════════════
 const POLAR = {
-  synced: '2026-06-04',
+  synced: '2026-06-04T08:00:00',
   // 28-day baselines (27 days with data, avg computed at sync)
   baseline: { hrv: 78.8, ans: 0.69, rhr: 56.5, intDur: 2520 },
   days: [
@@ -1421,6 +1450,29 @@ function polarDateFmt(d) {
   const dt = new Date(d);
   return dt.toLocaleDateString('nl-BE', {day:'numeric',month:'short'});
 }
+function fmtSyncTime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const date = d.toLocaleDateString('nl-BE', {day:'numeric', month:'short'});
+  const hh   = d.getHours().toString().padStart(2,'0');
+  const mm   = d.getMinutes().toString().padStart(2,'0');
+  return `${date} om ${hh}:${mm}`;
+}
+function updateSyncLabels() {
+  // Use localStorage override (set after manual refresh click) or fall back to embedded synced field
+  const lsTime = localStorage.getItem('polarLastSync');
+  const display = lsTime ? fmtSyncTime(lsTime) : fmtSyncTime(POLAR.synced);
+  document.querySelectorAll('#rec-sync-label, #health-sync-label').forEach(el => {
+    if (el) el.textContent = `gesynchroniseerd op ${display}`;
+  });
+}
+function polarRefresh(btn) {
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Laden…'; }
+  // Remember that user requested a refresh now
+  localStorage.setItem('polarLastSync', new Date().toISOString());
+  // Short delay so the button feedback is visible, then reload
+  setTimeout(() => window.location.reload(), 600);
+}
 
 // ── RECOVERY WIDGET (Overview) ──
 function renderRecoveryWidget() {
@@ -1443,7 +1495,7 @@ function renderRecoveryWidget() {
   document.getElementById('rec-score-lbl').textContent  = `${scIcon} ${scLbl}`;
   document.getElementById('rec-score-lbl').style.color  = scCol;
   document.getElementById('rec-status-row').textContent = stText(today.st);
-  document.getElementById('rec-polar-date').textContent = polarDateFmt(today.d);
+  updateSyncLabels();
 
   // HRV
   const hrvDiff = today.hrv - bl.hrv;
