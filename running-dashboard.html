@@ -1346,13 +1346,14 @@ function renderTrainingLoad() {
 // POLAR DATA  (synced 2026-06-04, days newest→oldest)
 // ═══════════════════════════════════════════
 const POLAR = {
-  synced: '2026-06-06T09:00:00',
-  // 28-day baselines (28 days with data, avg computed at sync)
-  baseline: { hrv: 79.7, ans: 1.02, rhr: 56.3, intDur: 2505 },
+  synced: '2026-06-06T10:30:00',
+  // 29-day baselines (29 days with data, avg computed at sync)
+  baseline: { hrv: 80.0, ans: 1.0, rhr: 56.3, intDur: 2514 },
   days: [
     // d=date, hrv=ms RMSSD, ans=ANS charge, rhr=bpm, st=nightly status(1-6),
     // dur=sleep total(s), ss=sleep score, deep/light/rem=sleep phases(s),
     // sc=sleep_charge Polar(1-5), intDur=total interruption duration(s)
+    {d:'2026-06-06',hrv:85, ans:1.6,  rhr:55,st:4,dur:30240,ss:73,deep:7620, light:12720,rem:7140, sc:3,intDur:2760},
     {d:'2026-06-05',hrv:103,ans:10,   rhr:51,st:5,dur:26760,ss:73,deep:6600, light:11340,rem:6720, sc:3,intDur:2100},
     {d:'2026-06-04',hrv:85, ans:6.4,  rhr:54,st:4,dur:27180,ss:64,deep:4890, light:14250,rem:4890, sc:2,intDur:3150},
     {d:'2026-06-03',hrv:71, ans:-4.4, rhr:57,st:4,dur:32850,ss:87,deep:7020, light:14700,rem:8280, sc:5,intDur:1920},
