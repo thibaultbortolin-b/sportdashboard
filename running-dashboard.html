@@ -1347,13 +1347,15 @@ function renderTrainingLoad() {
 // POLAR DATA  (synced 2026-06-04, days newest→oldest)
 // ═══════════════════════════════════════════
 const POLAR = {
-  synced: '2026-06-06T10:30:00',
-  // 29-day baselines (29 days with data, avg computed at sync)
+  synced: '2026-06-07T10:30:00',
+  // 30-day baselines (Polar avg, excl. Intervals.icu entries)
   baseline: { hrv: 80.0, ans: 1.0, rhr: 56.3, intDur: 2514 },
   days: [
     // d=date, hrv=ms RMSSD, ans=ANS charge, rhr=bpm, st=nightly status(1-6),
     // dur=sleep total(s), ss=sleep score, deep/light/rem=sleep phases(s),
     // sc=sleep_charge Polar(1-5), intDur=total interruption duration(s)
+    // NB: entries met src:'icu' komen van Intervals.icu (geen deep/rem/ANS beschikbaar)
+    {d:'2026-06-07',hrv:85, ans:null, rhr:54,st:3,dur:27360,ss:72,deep:null,light:null,rem:null,sc:2,intDur:null,src:'icu'},
     {d:'2026-06-06',hrv:85, ans:1.6,  rhr:55,st:4,dur:30240,ss:73,deep:7620, light:12720,rem:7140, sc:3,intDur:2760},
     {d:'2026-06-05',hrv:103,ans:10,   rhr:51,st:5,dur:26760,ss:73,deep:6600, light:11340,rem:6720, sc:3,intDur:2100},
     {d:'2026-06-04',hrv:85, ans:6.4,  rhr:54,st:4,dur:27180,ss:64,deep:4890, light:14250,rem:4890, sc:2,intDur:3150},
@@ -1406,25 +1408,29 @@ function recSleepColor(s) {
 }
 
 // ── sleep sub-score (0-100) ──
-// Components: slaapduur 25% · diepe slaap 25% · REM 25% · onderbrekingen 25%
+// Volledig (Polar): slaapduur 25% · diepe slaap 25% · REM 25% · onderbrekingen 25%
+// Beperkt (Intervals.icu): alleen slaapduur + slaapscore (andere componenten op 50)
 function sleepSubScore(day, intDurBl) {
-  const total = day.deep + day.light + day.rem;
-  if (total === 0 || !day.dur) return null;
-
-  // 1. Slaapduur (doel 7-9h)
+  if (!day.dur) return null;
   const h = day.dur / 3600;
   const durS = (h >= 7 && h <= 9) ? 100 : ((h >= 6 && h < 7) || (h > 9 && h <= 10)) ? 60 : 20;
 
-  // 2. Diepe slaap ≥18% van totale slaaptijd
+  // Als deep/light/rem niet beschikbaar (Intervals.icu): gebruik slaapscore als proxy
+  if (day.deep == null || day.light == null || day.rem == null) {
+    const ssProxy = day.ss != null ? Math.round(day.ss) : 50;
+    return Math.round(durS * 0.25 + ssProxy * 0.75);
+  }
+
+  const total = day.deep + day.light + day.rem;
+  if (total === 0) return Math.round(durS);
+
   const deepPct = day.deep / total * 100;
   const deepS = deepPct >= 18 ? 100 : deepPct >= 12 ? 60 : 20;
 
-  // 3. REM ≥18% van totale slaaptijd
   const remPct = day.rem / total * 100;
   const remS = remPct >= 18 ? 100 : remPct >= 12 ? 60 : 20;
 
-  // 4. Onderbrekingen (lager dan baseline = beter)
-  const intRatio = intDurBl > 0 ? day.intDur / intDurBl : 1;
+  const intRatio = (intDurBl > 0 && day.intDur != null) ? day.intDur / intDurBl : 1;
   const intS = intRatio <= 1.0 ? 100 : intRatio <= 1.3 ? 60 : 20;
 
   return Math.round(durS*0.25 + deepS*0.25 + remS*0.25 + intS*0.25);
@@ -1432,11 +1438,16 @@ function sleepSubScore(day, intDurBl) {
 
 // ── overall recovery score (0-100) ──
 // HRV 25% · ANS 25% · RHR 15% · Sleep 35%
+// Als ANS null is (Intervals.icu): gewicht herverdeeld naar HRV+Sleep
 function recScore(day, bl) {
   const h = day.hrv >= bl.hrv ? 100 : ((bl.hrv-day.hrv)/bl.hrv <= 0.15 ? 50 : 0);
-  const a = day.ans > 0 ? 100 : (day.ans >= -5 ? 50 : 0);
   const r = day.rhr <= bl.rhr ? 100 : (day.rhr - bl.rhr < 5 ? 50 : 0);
   const sl = sleepSubScore(day, bl.intDur) ?? 50;
+  if (day.ans == null) {
+    // Geen ANS: HRV 35% · RHR 15% · Sleep 50%
+    return Math.round(h*0.35 + r*0.15 + sl*0.50);
+  }
+  const a = day.ans > 0 ? 100 : (day.ans >= -5 ? 50 : 0);
   return Math.round(h*0.25 + a*0.25 + r*0.15 + sl*0.35);
 }
 function colorBadge(label, color) {
