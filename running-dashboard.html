@@ -278,86 +278,6 @@ body::after {
 .tl-card-sub { font-size:11px; color:var(--muted); margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border); }
 .tl-card-desc { font-size:12px; color:var(--t2); line-height:1.55; }
 
-/* ── POLAR / RECOVERY WIDGET ── */
-.rec-widget {
-  display:flex; align-items:stretch; background:var(--card);
-  border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:18px;
-  transition:border-color .2s;
-}
-.rec-widget:hover { border-color:var(--border-h); }
-.rec-overall {
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  padding:16px 24px; min-width:140px; text-align:center;
-  border-right:1px solid var(--border); background:rgba(255,255,255,.018);
-  flex-shrink:0;
-}
-.rec-overall-title { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:6px; }
-.rec-score-num { font-size:38px; font-weight:700; letter-spacing:-1.5px; line-height:1; }
-.rec-score-lbl { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-top:4px; }
-.rec-status-row { font-size:11px; color:var(--t2); margin-top:7px; }
-.rec-metrics { display:flex; flex:1; }
-.rec-m {
-  flex:1; padding:14px 12px; text-align:center;
-  border-right:1px solid var(--border);
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
-}
-.rec-m:last-child { border-right:none; }
-.rec-m-title { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:3px; }
-.rec-m-row  { display:flex; align-items:center; gap:7px; }
-.rec-m-dot  { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-.rec-m-val  { font-size:22px; font-weight:700; letter-spacing:-.5px; }
-.rec-m-unit { font-size:11px; color:var(--t2); }
-.rec-m-bl   { font-size:11px; color:var(--muted); }
-.rec-m-badge {
-  font-size:10px; font-weight:600; padding:2px 7px; border-radius:20px; margin-top:3px;
-}
-.rec-polar-source {
-  font-size:10px; color:var(--muted); padding:8px 12px;
-  display:flex; align-items:flex-end; flex-shrink:0; justify-content:flex-end;
-}
-
-/* ── POLAR SYNC BAR ── */
-.rec-sync-bar {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:8px 14px; border-top:1px solid var(--border);
-  background:rgba(255,255,255,.01); font-size:11px; color:var(--muted);
-  flex-shrink:0; min-width:0;
-}
-.rec-sync-bar span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.btn-polar {
-  display:inline-flex; align-items:center; gap:5px;
-  background:rgba(56,189,248,.08); border:1px solid rgba(56,189,248,.25);
-  color:var(--bike); padding:4px 11px; border-radius:7px;
-  font-size:11px; font-weight:600; cursor:pointer; flex-shrink:0;
-  transition:background .2s, border-color .2s;
-}
-.btn-polar:hover { background:rgba(56,189,248,.18); border-color:rgba(56,189,248,.5); }
-.btn-polar:disabled { opacity:.5; cursor:default; }
-
-/* ── HEALTH & RECOVERY TAB ── */
-.ht-compare { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px; }
-.ht-day-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; }
-.ht-day-title { font-size:13px; font-weight:700; margin-bottom:14px; }
-.ht-row { display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:7px 0; border-bottom:1px solid rgba(255,255,255,.04); }
-.ht-row:last-child { border-bottom:none; padding-bottom:0; }
-.ht-key { color:var(--t2); }
-.ht-val { font-weight:600; display:flex; align-items:center; gap:6px; }
-.delta-badge {
-  font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px;
-}
-.d-up  { background:rgba(34,197,94,.14);  color:#22c55e; }
-.d-dn  { background:rgba(239,68,68,.14);  color:#ef4444; }
-.d-neu { background:rgba(148,163,184,.1); color:var(--t2); }
-.sleep-phases { display:flex; height:10px; border-radius:5px; overflow:hidden; gap:1px; margin:8px 0 6px; }
-.sleep-legend { display:flex; gap:14px; flex-wrap:wrap; margin-top:4px; }
-.sleep-leg-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--t2); }
-.sleep-leg-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
-.ht-stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; }
-.ht-stat { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; text-align:center; }
-.ht-stat-lbl { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:6px; }
-.ht-stat-val { font-size:22px; font-weight:700; line-height:1; }
-.ht-stat-sub { font-size:11px; color:var(--muted); margin-top:5px; }
-
 /* scrollbar */
 ::-webkit-scrollbar { width:5px; height:5px; }
 ::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12); border-radius:3px; }
@@ -378,7 +298,7 @@ body::after {
     <div class="hdr-icon">⚡</div>
     <div>
       <div class="hdr-title">Personal Sport Dashboard</div>
-      <div class="hdr-sub">Strava · Apple Watch SE · Polar</div>
+      <div class="hdr-sub">Strava · Apple Watch SE · Wahoo</div>
     </div>
   </div>
   <div class="hdr-r">
@@ -396,7 +316,6 @@ body::after {
   <button class="tab-btn" onclick="switchTab('analysis',this)">Analysis</button>
   <button class="tab-btn" onclick="switchTab('year',this)">Year Stats</button>
   <button class="tab-btn" onclick="switchTab('training',this)">Training Load</button>
-  <button class="tab-btn" onclick="switchTab('health',this)">🫀 Gezondheid</button>
 </div>
 
 <!-- ══════════ TAB 1: OVERVIEW ══════════ -->
@@ -423,64 +342,6 @@ body::after {
     <div class="sc" style="--ac:var(--run)"><div class="sc-ico">⚡</div><div class="sc-lbl">Best Run Pace</div><div class="sc-val" id="s-pace">4:30<span class="u">/km</span></div><div class="sc-sub" id="s-pace-s">fastest run</div></div>
     <div class="sc" style="--ac:var(--work)"><div class="sc-ico">⛰</div><div class="sc-lbl">Elevation</div><div class="sc-val" id="s-elev">250<span class="u">m</span></div><div class="sc-sub" id="s-elev-s">total gain</div></div>
   </div>
-
-  <!-- ── POLAR RECOVERY WIDGET ── -->
-  <div class="rec-widget" style="flex-direction:column">
-  <div style="display:flex;align-items:stretch;flex:1">
-    <div class="rec-overall">
-      <div class="rec-overall-title">Herstel</div>
-      <div class="rec-score-num" id="rec-score-num">—</div>
-      <div class="rec-score-lbl" id="rec-score-lbl">—</div>
-      <div class="rec-status-row" id="rec-status-row">— Nightly Recharge</div>
-    </div>
-    <div class="rec-metrics">
-      <div class="rec-m">
-        <div class="rec-m-title">HRV</div>
-        <div class="rec-m-row">
-          <div class="rec-m-dot" id="rec-hrv-dot" style="background:var(--muted)"></div>
-          <span class="rec-m-val" id="rec-hrv-val">—</span>
-          <span class="rec-m-unit">ms</span>
-        </div>
-        <div class="rec-m-bl" id="rec-hrv-bl">baseline — ms</div>
-        <div class="rec-m-badge" id="rec-hrv-badge"></div>
-      </div>
-      <div class="rec-m">
-        <div class="rec-m-title">ANS-lading</div>
-        <div class="rec-m-row">
-          <div class="rec-m-dot" id="rec-ans-dot" style="background:var(--muted)"></div>
-          <span class="rec-m-val" id="rec-ans-val">—</span>
-        </div>
-        <div class="rec-m-bl" id="rec-ans-bl">baseline — score</div>
-        <div class="rec-m-badge" id="rec-ans-badge"></div>
-      </div>
-      <div class="rec-m">
-        <div class="rec-m-title">Rusthartslag</div>
-        <div class="rec-m-row">
-          <div class="rec-m-dot" id="rec-rhr-dot" style="background:var(--muted)"></div>
-          <span class="rec-m-val" id="rec-rhr-val">—</span>
-          <span class="rec-m-unit">bpm</span>
-        </div>
-        <div class="rec-m-bl" id="rec-rhr-bl">baseline — bpm</div>
-        <div class="rec-m-badge" id="rec-rhr-badge"></div>
-      </div>
-      <div class="rec-m">
-        <div class="rec-m-title">Slaapkwaliteit</div>
-        <div class="rec-m-row">
-          <div class="rec-m-dot" id="rec-sl-dot" style="background:var(--muted)"></div>
-          <span class="rec-m-val" id="rec-sl-val">—</span>
-          <span class="rec-m-unit">/ 100</span>
-        </div>
-        <div class="rec-m-bl" id="rec-sl-sub">duur · diep · rem · int.</div>
-        <div class="rec-m-badge" id="rec-sl-badge"></div>
-      </div>
-    </div>
-  </div><!-- /inner flex row -->
-  <div class="rec-sync-bar">
-    <span id="rec-sync-label">🔵 Polar · gesynchroniseerd op —</span>
-    <button class="btn-polar" id="btn-polar-refresh" onclick="polarRefresh(this)">🔄 Vernieuwen</button>
-  </div>
-  </div>
-  <!-- ── END RECOVERY WIDGET ── -->
 
   <div class="g21 mb">
     <div class="card">
@@ -668,74 +529,10 @@ body::after {
 </div>
 
 <!-- ══════════ TAB 5: GEZONDHEID & HERSTEL ══════════ -->
-<div id="tab-health" class="tab-panel">
-
-  <!-- Health tab sync bar -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-    <div style="font-size:12px;color:var(--muted)">🔵 Polar · <span id="health-sync-label">gesynchroniseerd op —</span></div>
-    <button class="btn-polar" onclick="polarRefresh(this)">🔄 Vernieuwen</button>
-  </div>
-
-  <!-- Section 1: Vandaag vs Gisteren -->
-  <div class="stitle">Herstel — Vandaag vs Gisteren</div>
-  <div class="ht-compare mb">
-    <div class="ht-day-card" id="ht-today-card">
-      <div class="ht-day-title">🌅 Vandaag — <span id="ht-today-date">—</span></div>
-      <div id="ht-today-rows"></div>
-    </div>
-    <div class="ht-day-card" id="ht-yest-card">
-      <div class="ht-day-title">🌙 Gisteren — <span id="ht-yest-date">—</span></div>
-      <div id="ht-yest-rows"></div>
-    </div>
-  </div>
-
-  <!-- Section 2: Slaap -->
-  <div class="stitle">Slaap</div>
-  <div class="g2 mb">
-    <div class="card">
-      <div class="card-hd"><div class="card-title">Gisteravond</div><div class="card-sub" id="ht-sleep-date">—</div></div>
-      <div id="ht-sleep-today"></div>
-    </div>
-    <div class="card">
-      <div class="card-hd"><div class="card-title">7-daagse slaaptrend</div><div class="card-sub">duur &amp; fasen in uren</div></div>
-      <div style="height:210px;position:relative"><canvas id="sleepTrendChart"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Section 3: HRV & ANS trend -->
-  <div class="stitle">HRV &amp; ANS-lading — 14 dagen</div>
-  <div class="card mb">
-    <div class="card-hd">
-      <div>
-        <div class="card-title">HRV (ms RMSSD) &amp; ANS-lading (score)</div>
-        <div class="card-sub">Gestippelde lijn = 28-daagse baseline</div>
-      </div>
-      <div style="display:flex;gap:16px;font-size:12px;align-items:center">
-        <span><span style="display:inline-block;width:18px;height:2px;background:#38bdf8;vertical-align:middle;margin-right:4px"></span>HRV</span>
-        <span><span style="display:inline-block;width:18px;height:2px;background:#c084fc;border-top:2px dashed #c084fc;vertical-align:middle;margin-right:4px"></span>ANS-lading</span>
-        <span><span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,255,255,.25);vertical-align:middle;margin-right:4px"></span>Baseline</span>
-      </div>
-    </div>
-    <div style="height:240px;position:relative"><canvas id="hrvAnsChart"></canvas></div>
-  </div>
-
-  <!-- Section 4: RHR trend -->
-  <div class="stitle">Rusthartslag — 14 dagen</div>
-  <div class="card mb">
-    <div class="card-hd">
-      <div>
-        <div class="card-title">Resting Heart Rate (bpm)</div>
-        <div class="card-sub">Gestippelde lijn = 28-daagse baseline (56.5 bpm)</div>
-      </div>
-    </div>
-    <div style="height:200px;position:relative"><canvas id="rhrChart"></canvas></div>
-  </div>
-
-</div><!-- /tab-health -->
 
 </div><!-- /wrap -->
 <div style="text-align:center;padding:20px 0 10px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);margin-top:32px">
-  Strava · Apple Watch SE · Polar · Kailo + Claude
+  Strava · Apple Watch SE · Wahoo · Kailo + Claude
 </div>
 
 <script>
@@ -1040,8 +837,7 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'health') { renderHealthTab(); updateSyncLabels(); }
-  setTimeout(()=>[cVol,cDonut,cPace,cPower,cSpeed,cBikeDist,cYear,cTL,cHrvAns,cRhr,cSleepTrend].forEach(c=>c&&c.resize()), 50);
+  setTimeout(()=>[cVol,cDonut,cPace,cPower,cSpeed,cBikeDist,cYear,cTL].forEach(c=>c&&c.resize()), 50);
 }
 
 // ═══════════════════════════════════════════
@@ -1344,12 +1140,9 @@ function renderTrainingLoad() {
 }
 
 // ═══════════════════════════════════════════
-// POLAR DATA  (synced 2026-06-04, days newest→oldest)
+// YEAR STATS PLACEHOLDER — POLAR REMOVED
 // ═══════════════════════════════════════════
-const POLAR = {
-  synced: '2026-06-07T10:30:00',
-  // 30-day baselines (Polar avg, excl. Intervals.icu entries)
-  baseline: { hrv: 80.0, ans: 1.0, rhr: 56.3, intDur: 2514 },
+const _POLAR_REMOVED = {
   days: [
     // d=date, hrv=ms RMSSD, ans=ANS charge, rhr=bpm, st=nightly status(1-6),
     // dur=sleep total(s), ss=sleep score, deep/light/rem=sleep phases(s),
@@ -1387,332 +1180,6 @@ const POLAR = {
     {d:'2026-05-08',hrv:72, ans:-2.3, rhr:57,st:3,dur:25590,ss:69,deep:6090, light:11160,rem:6210, sc:3,intDur:2130},
   ]
 };
-
-// ── colour helpers ──
-function recHrvColor(hrv, bl) {
-  if (hrv >= bl) return '#22c55e';
-  const d = (bl-hrv)/bl;
-  return d <= 0.15 ? '#f97316' : '#ef4444';
-}
-function recAnsColor(ans) {
-  if (ans > 0) return '#22c55e';
-  return ans >= -5 ? '#f97316' : '#ef4444';
-}
-function recRhrColor(rhr, bl) {
-  const d = rhr - bl;
-  if (d <= 0) return '#22c55e';
-  return d < 5 ? '#f97316' : '#ef4444';
-}
-function recSleepColor(s) {
-  return s >= 75 ? '#22c55e' : s >= 45 ? '#f97316' : '#ef4444';
-}
-
-// ── sleep sub-score (0-100) ──
-// Volledig (Polar): slaapduur 25% · diepe slaap 25% · REM 25% · onderbrekingen 25%
-// Beperkt (Intervals.icu): alleen slaapduur + slaapscore (andere componenten op 50)
-function sleepSubScore(day, intDurBl) {
-  if (!day.dur) return null;
-  const h = day.dur / 3600;
-  const durS = (h >= 7 && h <= 9) ? 100 : ((h >= 6 && h < 7) || (h > 9 && h <= 10)) ? 60 : 20;
-
-  // Als deep/light/rem niet beschikbaar (Intervals.icu): gebruik slaapscore als proxy
-  if (day.deep == null || day.light == null || day.rem == null) {
-    const ssProxy = day.ss != null ? Math.round(day.ss) : 50;
-    return Math.round(durS * 0.25 + ssProxy * 0.75);
-  }
-
-  const total = day.deep + day.light + day.rem;
-  if (total === 0) return Math.round(durS);
-
-  const deepPct = day.deep / total * 100;
-  const deepS = deepPct >= 18 ? 100 : deepPct >= 12 ? 60 : 20;
-
-  const remPct = day.rem / total * 100;
-  const remS = remPct >= 18 ? 100 : remPct >= 12 ? 60 : 20;
-
-  const intRatio = (intDurBl > 0 && day.intDur != null) ? day.intDur / intDurBl : 1;
-  const intS = intRatio <= 1.0 ? 100 : intRatio <= 1.3 ? 60 : 20;
-
-  return Math.round(durS*0.25 + deepS*0.25 + remS*0.25 + intS*0.25);
-}
-
-// ── overall recovery score (0-100) ──
-// HRV 25% · ANS 25% · RHR 15% · Sleep 35%
-// Als ANS null is (Intervals.icu): gewicht herverdeeld naar HRV+Sleep
-function recScore(day, bl) {
-  const h = day.hrv >= bl.hrv ? 100 : ((bl.hrv-day.hrv)/bl.hrv <= 0.15 ? 50 : 0);
-  const r = day.rhr <= bl.rhr ? 100 : (day.rhr - bl.rhr < 5 ? 50 : 0);
-  const sl = sleepSubScore(day, bl.intDur) ?? 50;
-  if (day.ans == null) {
-    // Geen ANS: HRV 35% · RHR 15% · Sleep 50%
-    return Math.round(h*0.35 + r*0.15 + sl*0.50);
-  }
-  const a = day.ans > 0 ? 100 : (day.ans >= -5 ? 50 : 0);
-  return Math.round(h*0.25 + a*0.25 + r*0.15 + sl*0.35);
-}
-function colorBadge(label, color) {
-  const bg = color+'22';
-  return `<span class="rec-m-badge" style="background:${bg};color:${color}">${label}</span>`;
-}
-function stText(st) {
-  return ['','🔴 Laag','🟠 Matig','🟡 Normaal','🔵 Goed','✅ Goed','🌟 Uitstekend'][st] || '—';
-}
-function fmtDur(sec) {
-  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60);
-  return `${h}u ${m.toString().padStart(2,'0')}m`;
-}
-function polarDateFmt(d) {
-  const dt = new Date(d);
-  return dt.toLocaleDateString('nl-BE', {day:'numeric',month:'short'});
-}
-function fmtSyncTime(iso) {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  const date = d.toLocaleDateString('nl-BE', {day:'numeric', month:'short'});
-  const hh   = d.getHours().toString().padStart(2,'0');
-  const mm   = d.getMinutes().toString().padStart(2,'0');
-  return `${date} om ${hh}:${mm}`;
-}
-function updateSyncLabels() {
-  // Use localStorage override (set after manual refresh click) or fall back to embedded synced field
-  const lsTime = localStorage.getItem('polarLastSync');
-  const display = lsTime ? fmtSyncTime(lsTime) : fmtSyncTime(POLAR.synced);
-  document.querySelectorAll('#rec-sync-label, #health-sync-label').forEach(el => {
-    if (el) el.textContent = `gesynchroniseerd op ${display}`;
-  });
-}
-function polarRefresh(btn) {
-  // The dashboard is a static file — Polar data is fetched by the scheduled
-  // Claude task (08:00 & 10:00) and baked into the HTML.
-  // This button reloads the page so you see the latest version after a sync.
-  const lastEmbed = fmtSyncTime(POLAR.synced);
-  const msg = `Polar data wordt automatisch bijgewerkt door:\n`
-            + `  • Dagelijkse sync om 08:00 (volledige history)\n`
-            + `  • Polar-specifieke sync om 10:00 (meest recente nacht)\n\n`
-            + `Laatste ingebakken sync: ${lastEmbed}\n\n`
-            + `Pagina herladen om de nieuwste versie te tonen?`;
-  if (confirm(msg)) {
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Laden…'; }
-    window.location.reload();
-  }
-}
-
-// ── RECOVERY WIDGET (Overview) ──
-function renderRecoveryWidget() {
-  if (!POLAR.days.length) return;
-  const today = POLAR.days[0];
-  const bl    = POLAR.baseline;
-
-  const hc    = recHrvColor(today.hrv, bl.hrv);
-  const ac    = recAnsColor(today.ans);
-  const rc    = recRhrColor(today.rhr, bl.rhr);
-  const slS   = sleepSubScore(today, bl.intDur) ?? 50;
-  const slC   = recSleepColor(slS);
-  const score = recScore(today, bl);
-  const scLbl  = score >= 75 ? 'Goed' : score >= 45 ? 'Matig' : 'Laag';
-  const scCol  = score >= 75 ? '#22c55e' : score >= 45 ? '#f97316' : '#ef4444';
-  const scIcon = score >= 75 ? '✅' : score >= 45 ? '⚠️' : '🔴';
-
-  document.getElementById('rec-score-num').textContent  = score;
-  document.getElementById('rec-score-num').style.color  = scCol;
-  document.getElementById('rec-score-lbl').textContent  = `${scIcon} ${scLbl}`;
-  document.getElementById('rec-score-lbl').style.color  = scCol;
-  document.getElementById('rec-status-row').textContent = stText(today.st);
-  updateSyncLabels();
-
-  // HRV
-  const hrvDiff = today.hrv - bl.hrv;
-  document.getElementById('rec-hrv-val').textContent       = today.hrv;
-  document.getElementById('rec-hrv-val').style.color       = hc;
-  document.getElementById('rec-hrv-dot').style.background  = hc;
-  document.getElementById('rec-hrv-bl').textContent        = `baseline ${Math.round(bl.hrv)} ms`;
-  document.getElementById('rec-hrv-badge').innerHTML       = colorBadge((hrvDiff>=0?'↑ +':'↓ ')+Math.abs(Math.round(hrvDiff))+' ms', hc);
-
-  // ANS
-  const ansDiff = today.ans - bl.ans;
-  document.getElementById('rec-ans-val').textContent       = (today.ans>0?'+':'')+today.ans;
-  document.getElementById('rec-ans-val').style.color       = ac;
-  document.getElementById('rec-ans-dot').style.background  = ac;
-  document.getElementById('rec-ans-bl').textContent        = `baseline ${bl.ans>=0?'+':''}${bl.ans.toFixed(1)}`;
-  document.getElementById('rec-ans-badge').innerHTML       = colorBadge((ansDiff>=0?'↑ +':'↓ ')+Math.abs(ansDiff.toFixed(1)), ac);
-
-  // RHR
-  const rhrDiff = today.rhr - bl.rhr;
-  document.getElementById('rec-rhr-val').textContent       = today.rhr;
-  document.getElementById('rec-rhr-val').style.color       = rc;
-  document.getElementById('rec-rhr-dot').style.background  = rc;
-  document.getElementById('rec-rhr-bl').textContent        = `baseline ${Math.round(bl.rhr)} bpm`;
-  document.getElementById('rec-rhr-badge').innerHTML       = colorBadge((rhrDiff<=0?'↓ ':'+')+(rhrDiff<=0?Math.abs(Math.round(rhrDiff)):Math.round(rhrDiff))+' bpm', rc);
-
-  // Sleep sub-score
-  const total   = today.deep + today.light + today.rem;
-  const deepPct = total > 0 ? Math.round(today.deep / total * 100) : 0;
-  const remPct  = total > 0 ? Math.round(today.rem  / total * 100) : 0;
-  const intMin  = Math.round(today.intDur / 60);
-  document.getElementById('rec-sl-val').textContent       = slS;
-  document.getElementById('rec-sl-val').style.color       = slC;
-  document.getElementById('rec-sl-dot').style.background  = slC;
-  document.getElementById('rec-sl-sub').textContent       = `${fmtDur(today.dur)} · diep ${deepPct}% · rem ${remPct}% · int. ${intMin}m`;
-  document.getElementById('rec-sl-badge').innerHTML       = colorBadge('Polar sleep charge ' + today.sc + '/5', slC);
-}
-
-// ── HEALTH TAB ──
-let cHrvAns=null, cRhr=null, cSleepTrend=null;
-
-function renderHealthTab() {
-  if (POLAR.days.length < 2) return;
-  const today = POLAR.days[0], yest = POLAR.days[1];
-  const bl = POLAR.baseline;
-
-  // ── Section 1: Today vs Yesterday ──
-  document.getElementById('ht-today-date').textContent = polarDateFmt(today.d);
-  document.getElementById('ht-yest-date').textContent  = polarDateFmt(yest.d);
-
-  function deltaHtml(val, ref, unit, lowerBetter) {
-    const diff = val - ref;
-    const better = lowerBetter ? diff < 0 : diff > 0;
-    const cls = diff === 0 ? 'd-neu' : better ? 'd-up' : 'd-dn';
-    const arrow = diff > 0 ? '↑' : diff < 0 ? '↓' : '→';
-    const abs = Math.abs(parseFloat(diff.toFixed(1)));
-    return `<span class="delta-badge ${cls}">${arrow} ${abs} ${unit}</span>`;
-  }
-
-  function dayRows(day, ref) {
-    const hc = recHrvColor(day.hrv, bl.hrv);
-    const ac = recAnsColor(day.ans);
-    const rc = recRhrColor(day.rhr, bl.rhr);
-    const sleepH = Math.floor(day.dur/3600), sleepM = Math.floor((day.dur%3600)/60);
-    const scoreClr = day.ss >= 75 ? '#22c55e' : day.ss >= 50 ? '#f97316' : '#ef4444';
-
-    const rows = [
-      ['HRV',       `<span style="color:${hc};font-weight:700">${day.hrv} ms</span>`, ref ? deltaHtml(day.hrv, ref.hrv, 'ms', false) : ''],
-      ['ANS-lading',`<span style="color:${ac};font-weight:700">${day.ans>0?'+':''}${day.ans}</span>`, ref ? deltaHtml(day.ans, ref.ans, '', false) : ''],
-      ['Rusthartslag',`<span style="color:${rc};font-weight:700">${day.rhr} bpm</span>`, ref ? deltaHtml(day.rhr, ref.rhr, 'bpm', true) : ''],
-      ['Nightly Recharge', stText(day.st), ''],
-      ['Slaapduur',    `${sleepH}u ${sleepM.toString().padStart(2,'0')}m`, ref ? deltaHtml(day.dur/3600, ref.dur/3600, 'u', false) : ''],
-      ['Slaapscore',   `<span style="color:${scoreClr};font-weight:700">${day.ss} / 100</span>`, ref ? deltaHtml(day.ss, ref.ss, '', false) : ''],
-      ['Onderbrekingen', `${Math.round(day.intDur/60)} min`, ref ? deltaHtml(day.intDur/60, ref.intDur/60, 'min', true) : ''],
-    ];
-    return rows.map(([k,v,d]) => `<div class="ht-row"><span class="ht-key">${k}</span><span class="ht-val">${v}${d}</span></div>`).join('');
-  }
-
-  document.getElementById('ht-today-rows').innerHTML = dayRows(today, yest);
-  document.getElementById('ht-yest-rows').innerHTML  = dayRows(yest, null);
-
-  // ── Section 2: Sleep today ──
-  document.getElementById('ht-sleep-date').textContent = polarDateFmt(today.d);
-  const totalSleepSec = today.deep + today.light + today.rem;
-  const deepPct  = totalSleepSec > 0 ? today.deep/totalSleepSec*100 : 0;
-  const remPct   = totalSleepSec > 0 ? today.rem/totalSleepSec*100  : 0;
-  const lightPct = totalSleepSec > 0 ? today.light/totalSleepSec*100: 0;
-  const otherPct = Math.max(0, 100 - deepPct - remPct - lightPct);
-  const scoreClr = today.ss >= 75 ? '#22c55e' : today.ss >= 50 ? '#f97316' : '#ef4444';
-
-  document.getElementById('ht-sleep-today').innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
-      <span style="font-size:26px;font-weight:700">${fmtDur(today.dur)}</span>
-      <span style="font-size:20px;font-weight:700;color:${scoreClr}">Score ${today.ss}</span>
-    </div>
-    <div class="sleep-phases">
-      <div class="sleep-phase" style="width:${deepPct.toFixed(1)}%;background:#38bdf8" title="Diepe slaap ${fmtDur(today.deep)}"></div>
-      <div class="sleep-phase" style="width:${remPct.toFixed(1)}%;background:#a855f7" title="REM ${fmtDur(today.rem)}"></div>
-      <div class="sleep-phase" style="width:${lightPct.toFixed(1)}%;background:#475569" title="Lichte slaap ${fmtDur(today.light)}"></div>
-      ${otherPct > 1 ? `<div class="sleep-phase" style="width:${otherPct.toFixed(1)}%;background:rgba(255,255,255,.1)" title="Overig"></div>` : ''}
-    </div>
-    <div class="sleep-legend">
-      <div class="sleep-leg-item"><div class="sleep-leg-dot" style="background:#38bdf8"></div>Diepe slaap ${fmtDur(today.deep)} (${deepPct.toFixed(0)}%)</div>
-      <div class="sleep-leg-item"><div class="sleep-leg-dot" style="background:#a855f7"></div>REM ${fmtDur(today.rem)} (${remPct.toFixed(0)}%)</div>
-      <div class="sleep-leg-item"><div class="sleep-leg-dot" style="background:#475569"></div>Lichte slaap ${fmtDur(today.light)} (${lightPct.toFixed(0)}%)</div>
-      <div class="sleep-leg-item"><div class="sleep-leg-dot" style="background:#ef4444"></div>Onderbrekingen ${fmtDur(today.intDur)}</div>
-    </div>`;
-
-  // ── Charts ──
-  const last14 = POLAR.days.slice(0,14).reverse();
-  const last7  = POLAR.days.slice(0,7).reverse();
-  const DG     = 'rgba(255,255,255,0.055)';
-
-  // Sleep trend (7 days stacked bar + line)
-  const sleepLabels = last7.map(d => polarDateFmt(d.d));
-  const toH = s => +(s/3600).toFixed(2);
-  if (!cSleepTrend) {
-    cSleepTrend = new Chart(document.getElementById('sleepTrendChart'), {
-      data: {
-        labels: sleepLabels,
-        datasets: [
-          { type:'bar', label:'Diepe slaap', data: last7.map(d=>toH(d.deep)),  backgroundColor:'#38bdf888', borderColor:'#38bdf8', borderWidth:1.5, borderRadius:3, stack:'s' },
-          { type:'bar', label:'REM',          data: last7.map(d=>toH(d.rem)),   backgroundColor:'#a855f788', borderColor:'#a855f7', borderWidth:1.5, borderRadius:3, stack:'s' },
-          { type:'bar', label:'Lichte slaap', data: last7.map(d=>toH(d.light)), backgroundColor:'#47556988', borderColor:'#475569', borderWidth:1.5, borderRadius:3, stack:'s' },
-          { type:'line', label:'Slaapscore', data: last7.map(d=>d.ss), borderColor:'#fb923c', backgroundColor:'rgba(251,146,60,.1)', borderWidth:2, pointRadius:3, tension:.35, yAxisID:'y2', fill:false },
-        ]
-      },
-      options: {
-        responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{ labels:{ boxWidth:8, usePointStyle:true, padding:12, font:{size:11} } } },
-        scales:{
-          x:  { grid:{color:DG}, stacked:true },
-          y:  { grid:{color:DG}, stacked:true, ticks:{callback:v=>v+'u'}, title:{display:true,text:'uren',font:{size:10},color:'#475569'} },
-          y2: { position:'right', grid:{drawOnChartArea:false}, min:0, max:100, ticks:{callback:v=>v+' pt'}, title:{display:true,text:'score',font:{size:10},color:'#475569'} }
-        }
-      }
-    });
-  }
-
-  // HRV + ANS 14-day dual-axis
-  const trendLabels = last14.map(d => polarDateFmt(d.d));
-  const blHrvLine   = Array(14).fill(POLAR.baseline.hrv);
-  const blAnsLine   = Array(14).fill(POLAR.baseline.ans);
-
-  if (!cHrvAns) {
-    cHrvAns = new Chart(document.getElementById('hrvAnsChart'), {
-      type:'line',
-      data:{
-        labels: trendLabels,
-        datasets:[
-          { label:'HRV (ms)', data:last14.map(d=>d.hrv), borderColor:'#38bdf8', backgroundColor:'rgba(56,189,248,.08)', borderWidth:2.5, tension:.35, fill:true, pointRadius:3, yAxisID:'yHrv' },
-          { label:'HRV baseline', data:blHrvLine, borderColor:'rgba(56,189,248,.35)', borderWidth:1.5, borderDash:[5,4], pointRadius:0, fill:false, yAxisID:'yHrv' },
-          { label:'ANS-lading', data:last14.map(d=>d.ans), borderColor:'#c084fc', backgroundColor:'transparent', borderWidth:2, tension:.35, fill:false, pointRadius:3, yAxisID:'yAns', borderDash:[5,3] },
-          { label:'ANS baseline', data:blAnsLine, borderColor:'rgba(192,132,252,.35)', borderWidth:1.5, borderDash:[5,4], pointRadius:0, fill:false, yAxisID:'yAns' },
-        ]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        interaction:{ mode:'index', intersect:false },
-        plugins:{ legend:{ labels:{ boxWidth:8, usePointStyle:true, padding:12, font:{size:11},
-          filter: item => !item.text.includes('baseline')
-        } }, tooltip:{ backgroundColor:'rgba(15,18,32,.95)', borderColor:'rgba(255,255,255,.1)', borderWidth:1 } },
-        scales:{
-          x:    { grid:{color:DG}, ticks:{font:{size:10}} },
-          yHrv: { position:'left',  grid:{color:DG}, ticks:{callback:v=>v+' ms'}, title:{display:true,text:'HRV ms',font:{size:10},color:'#38bdf8'} },
-          yAns: { position:'right', grid:{drawOnChartArea:false}, min:-12, max:12, ticks:{callback:v=>v}, title:{display:true,text:'ANS score',font:{size:10},color:'#c084fc'} }
-        }
-      }
-    });
-  }
-
-  // RHR 14-day
-  const blRhrLine = Array(14).fill(POLAR.baseline.rhr);
-  if (!cRhr) {
-    cRhr = new Chart(document.getElementById('rhrChart'), {
-      type:'line',
-      data:{
-        labels: trendLabels,
-        datasets:[
-          { label:'Rusthartslag', data:last14.map(d=>d.rhr), borderColor:'#fb923c', backgroundColor:'rgba(251,146,60,.08)', borderWidth:2.5, tension:.35, fill:true, pointRadius:3 },
-          { label:'Baseline (56.5)', data:blRhrLine, borderColor:'rgba(255,255,255,.25)', borderWidth:1.5, borderDash:[5,4], pointRadius:0, fill:false },
-        ]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        interaction:{ mode:'index', intersect:false },
-        plugins:{ legend:{ labels:{ boxWidth:8, usePointStyle:true, padding:12, font:{size:11} } } },
-        scales:{
-          x: { grid:{color:DG} },
-          y: { grid:{color:DG}, ticks:{callback:v=>v+' bpm'}, min:48, max:72 }
-        }
-      }
-    });
-  }
-}
 
 // ═══════════════════════════════════════════
 // YEAR STATS (fully dynamic from ACTS)
@@ -1858,7 +1325,6 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTrainingLoad();
   renderHRZoneDist();
   renderPersonalBests();
-  renderRecoveryWidget();
 });
 </script>
 </body>
