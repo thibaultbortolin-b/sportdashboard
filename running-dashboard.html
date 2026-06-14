@@ -1142,9 +1142,9 @@ function renderTrainingLoad() {
 }
 
 // ═══════════════════════════════════════════
-// YEAR STATS PLACEHOLDER — POLAR REMOVED
+// POLAR / SLEEP DATA
 // ═══════════════════════════════════════════
-const _POLAR_REMOVED = {
+const POLAR = {
   days: [
     // d=date, hrv=ms RMSSD, ans=ANS charge, rhr=bpm, st=nightly status(1-6),
     // dur=sleep total(s), ss=sleep score, deep/light/rem=sleep phases(s),
@@ -1180,7 +1180,8 @@ const _POLAR_REMOVED = {
     {d:'2026-05-10',hrv:70, ans:-10,  rhr:63,st:2,dur:31530,ss:73,deep:7380, light:14700,rem:6750, sc:4,intDur:2700},
     {d:'2026-05-09',hrv:71, ans:0.2,  rhr:56,st:4,dur:24630,ss:68,deep:4470, light:12990,rem:5070, sc:3,intDur:2100},
     {d:'2026-05-08',hrv:72, ans:-2.3, rhr:57,st:3,dur:25590,ss:69,deep:6090, light:11160,rem:6210, sc:3,intDur:2130},
-  ]
+  ],
+  baseline: {hrv:80.0, ans:1.0, rhr:56.2, intDur:2514}
 };
 
 // ═══════════════════════════════════════════
